@@ -5,9 +5,9 @@ export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable('access', table => {
     table.string('id').primary()
 
-    table.string('registration_code').unique()
+    table.integer('registration_code').unique()
     table.integer('number').unique()
-    table.string('name').notNullable()
+    table.string('name').notNullable().unique()
     table.string('password').notNullable()
     table.string('role')
     table.string('phoneNumber')
