@@ -3,12 +3,12 @@ import type { Knex } from 'knex'
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable('users', table => {
-    table.string('id').primary()
+    table.string('id').notNullable()
 
     table.string('email').unique()
     table.string('password')
 
-    table.foreign('id').references('id').inTable('access')
+    table.foreign('id').references('id').inTable('access').onDelete('CASCADE')
   })
 }
 

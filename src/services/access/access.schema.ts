@@ -11,7 +11,7 @@ export const accessSchema = {
   $id: 'Access',
   type: 'object',
   additionalProperties: false,
-  required: ['id', 'registration_code', 'number', 'name', 'password', 'role', 'phoneNumber', 'email', 'cep', 'address', 'city', 'state', 'photo', 'isActive', 'isAvailable', 'area', 'levelAccess', 'workGroup', 'createdAt', 'updatedAt'],
+  required: ['id', 'registration_code', 'number', 'name', 'password', 'role', 'phoneNumber', 'email', 'cep', 'address', 'city', 'state', 'photo', 'isActive', 'isAvailable', 'area', 'levelAccess', 'workGroup'],
   properties: {
     id: { type: 'string' },
 
@@ -32,8 +32,6 @@ export const accessSchema = {
     area: { type: 'string' },
     levelAccess: { type: 'string' },
     workGroup: { type: 'string' },
-    createdAt: { type: 'string' },
-    updatedAt: { type: 'string' },
   }
 } as const
 export type Access = FromSchema<typeof accessSchema>
@@ -47,7 +45,7 @@ export const accessDataSchema = {
   $id: 'AccessData',
   type: 'object',
   additionalProperties: false,
-  required: ['id', 'registration_code', 'number', 'name', 'password', 'role', 'phoneNumber', 'email', 'cep', 'address', 'city', 'state', 'photo', 'isActive', 'isAvailable', 'area', 'levelAccess', 'workGroup', 'createdAt', 'updatedAt'],
+  required: ['id', 'registration_code', 'number', 'name', 'password', 'role', 'phoneNumber', 'email', 'cep', 'address', 'city', 'state', 'photo', 'isActive', 'isAvailable', 'area', 'levelAccess', 'workGroup'],
   properties: {
     ...accessSchema.properties
   }
