@@ -4,6 +4,9 @@ import type { TransportConnection, Application } from '@feathersjs/feathers'
 import authenticationClient from '@feathersjs/authentication-client'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
+import { accessClient } from './services/access/access.shared'
+export type { Access, AccessData, AccessQuery, AccessPatch } from './services/access/access.shared'
+
 import { jobsClient } from './services/jobs/jobs.shared'
 export type { Jobs, JobsData, JobsQuery, JobsPatch } from './services/jobs/jobs.shared'
 
@@ -29,7 +32,7 @@ export type ClientApplication = Application<ServiceTypes, Configuration>
  * @see https://dove.feathersjs.com/api/client.html
  * @returns The Feathers client application
  */
-export const createClient = <Configuration = any>(
+export const createClient = <Configuration = any,>(
   connection: TransportConnection<ServiceTypes>,
   authenticationOptions: Partial<AuthenticationClientOptions> = {}
 ) => {
@@ -42,5 +45,6 @@ export const createClient = <Configuration = any>(
   client.configure(userClient)
   client.configure(tasksClient)
   client.configure(jobsClient)
+  client.configure(accessClient)
   return client
 }

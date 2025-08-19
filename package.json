@@ -45,7 +45,8 @@
     "migrate": "dotenvx run --env-file=.env -- knex migrate:latest",
     "migrate:up": "dotenvx run --env-file=.env -- knex migrate:up",
     "migrate:down": "dotenvx run --env-file=.env -- knex migrate:down",
-    "migrate:make": "dotenvx run -f .env -- knex migrate:make"
+    "migrate:make": "dotenvx run -f .env -- knex migrate:make",
+    "migrate:rollback": "dotenvx run --env-file=.env -- knex migrate:rollback"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.48.4",

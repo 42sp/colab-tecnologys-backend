@@ -1,3 +1,4 @@
+import { access } from './access/access'
 import { jobs } from './jobs/jobs'
 import { tasks } from './tasks/tasks'
 import { user } from './users/users'
@@ -5,6 +6,7 @@ import { user } from './users/users'
 import type { Application } from '../declarations'
 
 export const services = (app: Application) => {
+  app.configure(access)
   app.configure(jobs)
   app.configure(tasks)
   app.configure(user)
