@@ -2,6 +2,7 @@
 import { authenticate } from '@feathersjs/authentication'
 
 import { hooks as schemaHooks } from '@feathersjs/schema'
+import { createUser } from '../../hooks/access/create-user'
 
 import {
   accessDataValidator,
@@ -47,7 +48,8 @@ export const access = (app: Application) => {
       remove: []
     },
     after: {
-      all: []
+      all: [],
+      create: [createUser]
     },
     error: {
       all: []
