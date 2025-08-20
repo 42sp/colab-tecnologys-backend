@@ -12,16 +12,16 @@ export interface AccessParams extends KnexAdapterParams<AccessQuery> {}
 
 // By default calls the standard Knex adapter service methods but can be customized with your own functionality.
 export class AccessService<ServiceParams extends Params = AccessParams> extends KnexService<
-  Access,
-  AccessData,
-  AccessParams,
-  AccessPatch
+	Access,
+	AccessData,
+	AccessParams,
+	AccessPatch
 > {}
 
 export const getOptions = (app: Application): KnexAdapterOptions => {
-  return {
-    paginate: app.get('paginate'),
-    Model: app.get('postgresqlClient'),
-    name: 'access'
-  }
+	return {
+		paginate: app.get('paginate'),
+		Model: app.get('postgresqlClient'),
+		name: 'access',
+	}
 }

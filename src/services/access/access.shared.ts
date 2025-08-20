@@ -5,23 +5,32 @@ import type { Access, AccessData, AccessPatch, AccessQuery, AccessService } from
 
 export type { Access, AccessData, AccessPatch, AccessQuery }
 
-export type AccessClientService = Pick<AccessService<Params<AccessQuery>>, (typeof accessMethods)[number]>
+export type AccessClientService = Pick<
+	AccessService<Params<AccessQuery>>,
+	(typeof accessMethods)[number]
+>
 
 export const accessPath = 'access'
 
-export const accessMethods: Array<keyof AccessService> = ['find', 'get', 'create', 'patch', 'remove']
+export const accessMethods: Array<keyof AccessService> = [
+	'find',
+	'get',
+	'create',
+	'patch',
+	'remove',
+]
 
 export const accessClient = (client: ClientApplication) => {
-  const connection = client.get('connection')
+	const connection = client.get('connection')
 
-  client.use(accessPath, connection.service(accessPath), {
-    methods: accessMethods
-  })
+	client.use(accessPath, connection.service(accessPath), {
+		methods: accessMethods,
+	})
 }
 
 // Add this service to the client service type index
 declare module '../../client' {
-  interface ServiceTypes {
-    [accessPath]: AccessClientService
-  }
+	interface ServiceTypes {
+		[accessPath]: AccessClientService
+	}
 }

@@ -12,16 +12,16 @@ export interface JobsParams extends KnexAdapterParams<JobsQuery> {}
 
 // By default calls the standard Knex adapter service methods but can be customized with your own functionality.
 export class JobsService<ServiceParams extends Params = JobsParams> extends KnexService<
-  Jobs,
-  JobsData,
-  JobsParams,
-  JobsPatch
+	Jobs,
+	JobsData,
+	JobsParams,
+	JobsPatch
 > {}
 
 export const getOptions = (app: Application): KnexAdapterOptions => {
-  return {
-    paginate: app.get('paginate'),
-    Model: app.get('postgresqlClient'),
-    name: 'jobs'
-  }
+	return {
+		paginate: app.get('paginate'),
+		Model: app.get('postgresqlClient'),
+		name: 'jobs',
+	}
 }

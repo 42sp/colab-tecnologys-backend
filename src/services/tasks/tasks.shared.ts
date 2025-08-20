@@ -5,23 +5,26 @@ import type { Tasks, TasksData, TasksPatch, TasksQuery, TasksService } from './t
 
 export type { Tasks, TasksData, TasksPatch, TasksQuery }
 
-export type TasksClientService = Pick<TasksService<Params<TasksQuery>>, (typeof tasksMethods)[number]>
+export type TasksClientService = Pick<
+	TasksService<Params<TasksQuery>>,
+	(typeof tasksMethods)[number]
+>
 
 export const tasksPath = 'tasks'
 
 export const tasksMethods: Array<keyof TasksService> = ['find', 'get', 'create', 'patch', 'remove']
 
 export const tasksClient = (client: ClientApplication) => {
-  const connection = client.get('connection')
+	const connection = client.get('connection')
 
-  client.use(tasksPath, connection.service(tasksPath), {
-    methods: tasksMethods
-  })
+	client.use(tasksPath, connection.service(tasksPath), {
+		methods: tasksMethods,
+	})
 }
 
 // Add this service to the client service type index
 declare module '../../client' {
-  interface ServiceTypes {
-    [tasksPath]: TasksClientService
-  }
+	interface ServiceTypes {
+		[tasksPath]: TasksClientService
+	}
 }

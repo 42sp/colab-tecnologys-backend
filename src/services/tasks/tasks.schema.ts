@@ -8,30 +8,30 @@ import type { TasksService } from './tasks.class'
 
 // Main data model schema
 export const tasksSchema = {
-  $id: 'Tasks',
-  type: 'object',
-  additionalProperties: false,
-  required: [
-    'date_performed_service',
-    'date_launched_service',
-    'percentage',
-    'worker',
-    'registration_code',
-    'number',
-    'approver_id'
-  ],
-  properties: {
-    id: { type: 'number' },
+	$id: 'Tasks',
+	type: 'object',
+	additionalProperties: false,
+	required: [
+		'date_performed_service',
+		'date_launched_service',
+		'percentage',
+		'worker',
+		'registration_code',
+		'number',
+		'approver_id',
+	],
+	properties: {
+		id: { type: 'number' },
 
-    id_service: { type: 'string' },
-    date_performed_service: { type: 'string' },
-    date_launched_service: { type: 'string' },
-    percentage: { type: 'number' },
-    worker: { type: 'string' },
-    registration_code: { type: 'number' },
-    number: { type: 'number' },
-    approver_id: { type: 'string' }
-  }
+		id_service: { type: 'string' },
+		date_performed_service: { type: 'string' },
+		date_launched_service: { type: 'string' },
+		percentage: { type: 'number' },
+		worker: { type: 'string' },
+		registration_code: { type: 'number' },
+		number: { type: 'number' },
+		approver_id: { type: 'string' },
+	},
 } as const
 export type Tasks = FromSchema<typeof tasksSchema>
 export const tasksValidator = getValidator(tasksSchema, dataValidator)
@@ -41,21 +41,21 @@ export const tasksExternalResolver = resolve<Tasks, HookContext<TasksService>>({
 
 // Schema for creating new data
 export const tasksDataSchema = {
-  $id: 'TasksData',
-  type: 'object',
-  additionalProperties: false,
-  required: [
-    'date_performed_service',
-    'date_launched_service',
-    'percentage',
-    'worker',
-    'registration_code',
-    'number',
-    'approver_id'
-  ],
-  properties: {
-    ...tasksSchema.properties
-  }
+	$id: 'TasksData',
+	type: 'object',
+	additionalProperties: false,
+	required: [
+		'date_performed_service',
+		'date_launched_service',
+		'percentage',
+		'worker',
+		'registration_code',
+		'number',
+		'approver_id',
+	],
+	properties: {
+		...tasksSchema.properties,
+	},
 } as const
 export type TasksData = FromSchema<typeof tasksDataSchema>
 export const tasksDataValidator = getValidator(tasksDataSchema, dataValidator)
@@ -63,13 +63,13 @@ export const tasksDataResolver = resolve<TasksData, HookContext<TasksService>>({
 
 // Schema for updating existing data
 export const tasksPatchSchema = {
-  $id: 'TasksPatch',
-  type: 'object',
-  additionalProperties: false,
-  required: [],
-  properties: {
-    ...tasksSchema.properties
-  }
+	$id: 'TasksPatch',
+	type: 'object',
+	additionalProperties: false,
+	required: [],
+	properties: {
+		...tasksSchema.properties,
+	},
 } as const
 export type TasksPatch = FromSchema<typeof tasksPatchSchema>
 export const tasksPatchValidator = getValidator(tasksPatchSchema, dataValidator)
@@ -77,12 +77,12 @@ export const tasksPatchResolver = resolve<TasksPatch, HookContext<TasksService>>
 
 // Schema for allowed query properties
 export const tasksQuerySchema = {
-  $id: 'TasksQuery',
-  type: 'object',
-  additionalProperties: false,
-  properties: {
-    ...querySyntax(tasksSchema.properties)
-  }
+	$id: 'TasksQuery',
+	type: 'object',
+	additionalProperties: false,
+	properties: {
+		...querySyntax(tasksSchema.properties),
+	},
 } as const
 export type TasksQuery = FromSchema<typeof tasksQuerySchema>
 export const tasksQueryValidator = getValidator(tasksQuerySchema, queryValidator)

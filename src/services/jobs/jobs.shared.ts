@@ -12,16 +12,16 @@ export const jobsPath = 'jobs'
 export const jobsMethods: Array<keyof JobsService> = ['find', 'get', 'create', 'patch', 'remove']
 
 export const jobsClient = (client: ClientApplication) => {
-  const connection = client.get('connection')
+	const connection = client.get('connection')
 
-  client.use(jobsPath, connection.service(jobsPath), {
-    methods: jobsMethods
-  })
+	client.use(jobsPath, connection.service(jobsPath), {
+		methods: jobsMethods,
+	})
 }
 
 // Add this service to the client service type index
 declare module '../../client' {
-  interface ServiceTypes {
-    [jobsPath]: JobsClientService
-  }
+	interface ServiceTypes {
+		[jobsPath]: JobsClientService
+	}
 }

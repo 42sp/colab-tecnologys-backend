@@ -12,16 +12,16 @@ export const userPath = 'users'
 export const userMethods: Array<keyof UserService> = ['find', 'get', 'create', 'patch', 'remove']
 
 export const userClient = (client: ClientApplication) => {
-  const connection = client.get('connection')
+	const connection = client.get('connection')
 
-  client.use(userPath, connection.service(userPath), {
-    methods: userMethods
-  })
+	client.use(userPath, connection.service(userPath), {
+		methods: userMethods,
+	})
 }
 
 // Add this service to the client service type index
 declare module '../../client' {
-  interface ServiceTypes {
-    [userPath]: UserClientService
-  }
+	interface ServiceTypes {
+		[userPath]: UserClientService
+	}
 }
