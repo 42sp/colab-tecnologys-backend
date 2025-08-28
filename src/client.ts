@@ -4,11 +4,14 @@ import type { TransportConnection, Application } from '@feathersjs/feathers'
 import authenticationClient from '@feathersjs/authentication-client'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
+import { profileClient } from './services/profile/profile.shared'
+export type { Profile, ProfileData, ProfileQuery, ProfilePatch } from './services/profile/profile.shared'
+
 import { usersClient } from './services/users/users.shared'
 export type { Users, UsersData, UsersQuery, UsersPatch } from './services/users/users.shared'
 
 export interface Configuration {
-	connection: TransportConnection<ServiceTypes>
+  connection: TransportConnection<ServiceTypes>
 }
 
 export interface ServiceTypes {}
@@ -23,16 +26,17 @@ export type ClientApplication = Application<ServiceTypes, Configuration>
  * @see https://dove.feathersjs.com/api/client.html
  * @returns The Feathers client application
  */
-export const createClient = <Configuration = any>(
-	connection: TransportConnection<ServiceTypes>,
-	authenticationOptions: Partial<AuthenticationClientOptions> = {},
+export const createClient = <Configuration = any,>(
+  connection: TransportConnection<ServiceTypes>,
+  authenticationOptions: Partial<AuthenticationClientOptions> = {}
 ) => {
-	const client: ClientApplication = feathers()
+  const client: ClientApplication = feathers()
 
-	client.configure(connection)
-	client.configure(authenticationClient(authenticationOptions))
-	client.set('connection', connection)
+  client.configure(connection)
+  client.configure(authenticationClient(authenticationOptions))
+  client.set('connection', connection)
 
-	client.configure(usersClient)
-	return client
+  client.configure(usersClient)
+  client.configure(profileClient)
+  return client
 }
