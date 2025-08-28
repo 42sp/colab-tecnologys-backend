@@ -4,17 +4,8 @@ import type { TransportConnection, Application } from '@feathersjs/feathers'
 import authenticationClient from '@feathersjs/authentication-client'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
-import { accessClient } from './services/access/access.shared'
-export type { Access, AccessData, AccessQuery, AccessPatch } from './services/access/access.shared'
-
-import { jobsClient } from './services/jobs/jobs.shared'
-export type { Jobs, JobsData, JobsQuery, JobsPatch } from './services/jobs/jobs.shared'
-
-import { tasksClient } from './services/tasks/tasks.shared'
-export type { Tasks, TasksData, TasksQuery, TasksPatch } from './services/tasks/tasks.shared'
-
-import { userClient } from './services/users/users.shared'
-export type { User, UserData, UserQuery, UserPatch } from './services/users/users.shared'
+import { usersClient } from './services/users/users.shared'
+export type { Users, UsersData, UsersQuery, UsersPatch } from './services/users/users.shared'
 
 export interface Configuration {
 	connection: TransportConnection<ServiceTypes>
@@ -42,9 +33,6 @@ export const createClient = <Configuration = any>(
 	client.configure(authenticationClient(authenticationOptions))
 	client.set('connection', connection)
 
-	client.configure(userClient)
-	client.configure(tasksClient)
-	client.configure(jobsClient)
-	client.configure(accessClient)
+	client.configure(usersClient)
 	return client
 }
