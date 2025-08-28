@@ -4,6 +4,12 @@ import type { TransportConnection, Application } from '@feathersjs/feathers'
 import authenticationClient from '@feathersjs/authentication-client'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
+import { uploadsClient } from './services/uploads/uploads.shared'
+export type { Uploads, UploadsData, UploadsQuery, UploadsPatch } from './services/uploads/uploads.shared'
+
+import { uploadClient } from './services/upload/upload.shared'
+export type { Upload, UploadData, UploadQuery, UploadPatch } from './services/upload/upload.shared'
+
 import { accessClient } from './services/access/access.shared'
 export type { Access, AccessData, AccessQuery, AccessPatch } from './services/access/access.shared'
 
@@ -17,7 +23,7 @@ import { userClient } from './services/users/users.shared'
 export type { User, UserData, UserQuery, UserPatch } from './services/users/users.shared'
 
 export interface Configuration {
-	connection: TransportConnection<ServiceTypes>
+  connection: TransportConnection<ServiceTypes>
 }
 
 export interface ServiceTypes {}
@@ -32,19 +38,21 @@ export type ClientApplication = Application<ServiceTypes, Configuration>
  * @see https://dove.feathersjs.com/api/client.html
  * @returns The Feathers client application
  */
-export const createClient = <Configuration = any>(
-	connection: TransportConnection<ServiceTypes>,
-	authenticationOptions: Partial<AuthenticationClientOptions> = {},
+export const createClient = <Configuration = any,>(
+  connection: TransportConnection<ServiceTypes>,
+  authenticationOptions: Partial<AuthenticationClientOptions> = {}
 ) => {
-	const client: ClientApplication = feathers()
+  const client: ClientApplication = feathers()
 
-	client.configure(connection)
-	client.configure(authenticationClient(authenticationOptions))
-	client.set('connection', connection)
+  client.configure(connection)
+  client.configure(authenticationClient(authenticationOptions))
+  client.set('connection', connection)
 
-	client.configure(userClient)
-	client.configure(tasksClient)
-	client.configure(jobsClient)
-	client.configure(accessClient)
-	return client
+  client.configure(userClient)
+  client.configure(tasksClient)
+  client.configure(jobsClient)
+  client.configure(accessClient)
+  client.configure(uploadClient)
+  client.configure(uploadsClient)
+  return client
 }

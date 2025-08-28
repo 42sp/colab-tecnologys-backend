@@ -1,4 +1,6 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/application.html
+const fs = require('fs');
+!fs.existsSync('images') && fs.mkdirSync('images');
 import { feathers } from '@feathersjs/feathers'
 import express, {
 	rest,
@@ -22,15 +24,21 @@ import { services } from './services/index'
 import { channels } from './channels'
 import { authentication } from './authentication'
 
+var serveIndex = require('serve-index')
+
 const app: Application = express(feathers())
 
 // Load app configuration
 app.configure(configuration(configurationValidator))
 app.use(cors())
-app.use(json())
-app.use(urlencoded({ extended: true }))
+app.use(json({ limit: '50mb' }))
+app.use(urlencoded({ limit: '50mb', extended: true }))
 // Host the public folder
 app.use('/', serveStatic(app.get('public')))
+
+app.use('/images', serveIndex('images'))
+app.use('/images', serveStatic('images'))
+
 
 // Configure services and real-time functionality
 app.configure(rest())
