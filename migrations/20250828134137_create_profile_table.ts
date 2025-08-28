@@ -16,8 +16,8 @@ export async function up(knex: Knex): Promise<void> {
 		table.string('state', 2)
 		table.string('postcode', 15)
 
-		table.uuid('access_id').notNullable().unique()
-		table.foreign('access_id').references('id').inTable('access')
+		table.uuid('user_id').notNullable().unique()
+		table.foreign('user_id').references('id').inTable('users')
 
 		table.uuid('role_id')
 		table.foreign('role_id').references('id').inTable('roles')
