@@ -8,7 +8,6 @@ import type { UsersService } from './users.class'
 
 import { v4 as uuidv4 } from 'uuid'
 import { passwordHash } from '@feathersjs/authentication-local'
-import { Profile } from '../profile/profile.schema'
 
 // Main data model schema
 export const usersSchema = {

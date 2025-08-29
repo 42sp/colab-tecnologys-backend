@@ -44,11 +44,6 @@ export const profile = (app: Application) => {
 			all: [
 				schemaHooks.validateQuery(profileQueryValidator),
 				schemaHooks.resolveQuery(profileQueryResolver),
-				// async (context) => {
-				// 	if (!context.params?.user?.id) throw new Error('Unauthorized')
-				// 	context.params.query = { user_id: context.params.user.id }
-				// 	return context
-				// },
 			],
 			find: [],
 			get: [],
