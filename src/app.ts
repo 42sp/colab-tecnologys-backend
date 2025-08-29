@@ -22,6 +22,8 @@ import { services } from './services/index'
 import { channels } from './channels'
 import { authentication } from './authentication'
 
+var serveIndex = require('serve-index')
+
 const app: Application = express(feathers())
 
 // Load app configuration
@@ -31,6 +33,9 @@ app.use(json())
 app.use(urlencoded({ extended: true }))
 // Host the public folder
 app.use('/', serveStatic(app.get('public')))
+
+app.use('/images', serveIndex('images'))
+app.use('/images', serveStatic('images'))
 
 // Configure services and real-time functionality
 app.configure(rest())
