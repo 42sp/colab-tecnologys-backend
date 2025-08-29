@@ -1,5 +1,5 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
-import { resolve, getValidator, querySyntax } from '@feathersjs/schema'
+import { resolve, getValidator, querySyntax, queryProperties } from '@feathersjs/schema'
 import type { FromSchema } from '@feathersjs/schema'
 
 import type { HookContext } from '../../declarations'
@@ -8,6 +8,7 @@ import type { UsersService } from './users.class'
 
 import { v4 as uuidv4 } from 'uuid'
 import { passwordHash } from '@feathersjs/authentication-local'
+import { Profile } from '../profile/profile.schema'
 
 // Main data model schema
 export const usersSchema = {
@@ -19,6 +20,10 @@ export const usersSchema = {
 		id: { type: 'string', format: 'uuid' },
 		email: { type: 'string', format: 'email' },
 		password: { type: 'string' },
+		profile_id: { type: 'string', format: 'uuid' },
+		role_id: { type: 'string', format: 'uuid' },
+		is_active: { type: 'boolean' },
+		is_available: { type: 'boolean' },
 		created_at: { type: 'string', format: 'date-time' },
 		updated_at: { type: 'string', format: 'date-time' },
 	},
@@ -46,8 +51,6 @@ export const usersDataValidator = getValidator(usersDataSchema, dataValidator)
 export const usersDataResolver = resolve<UsersData, HookContext<UsersService>>({
 	id: async () => uuidv4(),
 	password: passwordHash({ strategy: 'local' }),
-	created_at: async () => new Date().toISOString(),
-	updated_at: async () => new Date().toISOString(),
 })
 
 // Schema for updating existing data
@@ -58,8 +61,6 @@ export const usersPatchSchema = {
 	required: [],
 	properties: {
 		...usersSchema.properties,
-		newPassword: { type: 'string' },
-		newEmail: { type: 'string', format: 'email' },
 	},
 } as const
 export type UsersPatch = FromSchema<typeof usersPatchSchema>

@@ -12,16 +12,16 @@ export interface ProfileParams extends KnexAdapterParams<ProfileQuery> {}
 
 // By default calls the standard Knex adapter service methods but can be customized with your own functionality.
 export class ProfileService<ServiceParams extends Params = ProfileParams> extends KnexService<
-  Profile,
-  ProfileData,
-  ProfileParams,
-  ProfilePatch
+	Profile,
+	ProfileData,
+	ProfileParams,
+	ProfilePatch
 > {}
 
 export const getOptions = (app: Application): KnexAdapterOptions => {
-  return {
-    paginate: app.get('paginate'),
-    Model: app.get('postgresqlClient'),
-    name: 'profile'
-  }
+	return {
+		paginate: app.get('paginate'),
+		Model: app.get('postgresqlClient'),
+		name: 'profiles',
+	}
 }

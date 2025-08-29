@@ -7,7 +7,6 @@ import { dataValidator, queryValidator } from '../../validators'
 import type { ProfileService } from './profile.class'
 
 import { v4 as uuidv4 } from 'uuid'
-import { exceptions } from 'winston'
 
 // Main data model schema
 export const profileSchema = {
@@ -28,9 +27,6 @@ export const profileSchema = {
 		state: { type: 'string' },
 		postcode: { type: 'string' },
 		user_id: { type: 'string', format: 'uuid' },
-		role_id: { type: 'string', format: 'uuid' },
-		is_active: { type: 'boolean' },
-		is_available: { type: 'boolean' },
 		created_at: { type: 'string', format: 'date-time' },
 		updated_at: { type: 'string', format: 'date-time' },
 	},
@@ -66,9 +62,8 @@ export const profileDataValidator = getValidator(profileDataSchema, dataValidato
 export const profileDataResolver = resolve<ProfileData, HookContext<ProfileService>>({
 	id: async () => uuidv4(),
 	user_id: async (_, __, context) => {
-		if (context.params?.user?.id) {
-			return context.params.user.id
-		}
+		if (context.params?.user?.id) return context.params.user.id
+
 		throw new Error('user_id must be provided')
 	},
 })
@@ -101,10 +96,8 @@ export const profileQuerySchema = {
 export type ProfileQuery = FromSchema<typeof profileQuerySchema>
 export const profileQueryValidator = getValidator(profileQuerySchema, queryValidator)
 export const profileQueryResolver = resolve<ProfileQuery, HookContext<ProfileService>>({
-	id: async (value, _, context) => {
-		if (context.params.user) {
-			return context.params.user.id
-		}
-		return value
+	user_id: async (_value, _data, context) => {
+		if (!context.params.user?.id) throw new Error('Unauthorized')
+		return context.params.user.id
 	},
 })

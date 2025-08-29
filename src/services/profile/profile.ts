@@ -17,6 +17,7 @@ import {
 import type { Application } from '../../declarations'
 import { ProfileService, getOptions } from './profile.class'
 import { profilePath, profileMethods } from './profile.shared'
+import { saveProfileId } from './profile.hooks'
 
 export * from './profile.class'
 export * from './profile.schema'
@@ -43,26 +44,31 @@ export const profile = (app: Application) => {
 			all: [
 				schemaHooks.validateQuery(profileQueryValidator),
 				schemaHooks.resolveQuery(profileQueryResolver),
+				// async (context) => {
+				// 	if (!context.params?.user?.id) throw new Error('Unauthorized')
+				// 	context.params.query = { user_id: context.params.user.id }
+				// 	return context
+				// },
 			],
 			find: [],
 			get: [],
 			create: [
 				schemaHooks.validateData(profileDataValidator),
 				schemaHooks.resolveData(profileDataResolver),
+				async (context) => {
+					if (context.params?.user?.profile_id) throw new Error('User already has a profile')
+					return context
+				},
 			],
 			patch: [
 				schemaHooks.validateData(profilePatchValidator),
 				schemaHooks.resolveData(profilePatchResolver),
-				async (context) => {
-					if (!context.params?.user?.id) throw new Error('Unauthorized')
-					context.params.query = { user_id: context.params.user.id }
-					return context
-				},
 			],
 			remove: [],
 		},
 		after: {
 			all: [],
+			create: [saveProfileId],
 		},
 		error: {
 			all: [],
