@@ -8,6 +8,7 @@ import type { UsersService } from './users.class'
 
 import { v4 as uuidv4 } from 'uuid'
 import { passwordHash } from '@feathersjs/authentication-local'
+import { isValidCPF } from './users.utils'
 
 // Main data model schema
 export const usersSchema = {
@@ -50,6 +51,14 @@ export const usersDataValidator = getValidator(usersDataSchema, dataValidator)
 export const usersDataResolver = resolve<UsersData, HookContext<UsersService>>({
 	id: async () => uuidv4(),
 	password: passwordHash({ strategy: 'local' }),
+	cpf: async (value) => {
+		if (!value) throw new Error('CPF é obrigatório')
+
+		const cpfDigits = value.replace(/\D/g, '')
+		if (!isValidCPF(cpfDigits)) throw new Error('CPF inválido')
+
+		return cpfDigits
+	},
 })
 
 // Schema for updating existing data
@@ -67,6 +76,14 @@ export const usersPatchValidator = getValidator(usersPatchSchema, dataValidator)
 export const usersPatchResolver = resolve<UsersPatch, HookContext<UsersService>>({
 	password: passwordHash({ strategy: 'local' }),
 	updated_at: async () => new Date().toISOString(),
+	cpf: async (value) => {
+		if (value) {
+			const cpfDigits = value.replace(/\D/g, '')
+			if (!isValidCPF(cpfDigits)) throw new Error('CPF inválido')
+
+			return cpfDigits
+		}
+	},
 })
 
 // Schema for allowed query properties
