@@ -9,13 +9,11 @@ import { format } from 'path'
 
 // Main data model schema
 export const uploadsSchema = {
-  $id: 'Uploads',
-  type: 'object',
-  additionalProperties: true,
-  required: [],
-  properties: {
-
-  }
+	$id: 'Uploads',
+	type: 'object',
+	additionalProperties: true,
+	required: [],
+	properties: {},
 } as const
 export type Uploads = FromSchema<typeof uploadsSchema>
 export const uploadsValidator = getValidator(uploadsSchema, dataValidator)
@@ -25,13 +23,13 @@ export const uploadsExternalResolver = resolve<Uploads, HookContext<UploadsServi
 
 // Schema for creating new data
 export const uploadsDataSchema = {
-  $id: 'UploadsData',
-  type: 'object',
-  additionalProperties: true,
-  required: [],
-  properties: {
-    ...uploadsSchema.properties
-  }
+	$id: 'UploadsData',
+	type: 'object',
+	additionalProperties: true,
+	required: [],
+	properties: {
+		...uploadsSchema.properties,
+	},
 } as const
 export type UploadsData = FromSchema<typeof uploadsDataSchema>
 export const uploadsDataValidator = getValidator(uploadsDataSchema, dataValidator)
@@ -39,13 +37,13 @@ export const uploadsDataResolver = resolve<UploadsData, HookContext<UploadsServi
 
 // Schema for updating existing data
 export const uploadsPatchSchema = {
-  $id: 'UploadsPatch',
-  type: 'object',
-  additionalProperties: true,
-  required: [],
-  properties: {
-    ...uploadsSchema.properties
-  }
+	$id: 'UploadsPatch',
+	type: 'object',
+	additionalProperties: true,
+	required: [],
+	properties: {
+		...uploadsSchema.properties,
+	},
 } as const
 export type UploadsPatch = FromSchema<typeof uploadsPatchSchema>
 export const uploadsPatchValidator = getValidator(uploadsPatchSchema, dataValidator)
@@ -53,12 +51,12 @@ export const uploadsPatchResolver = resolve<UploadsPatch, HookContext<UploadsSer
 
 // Schema for allowed query properties
 export const uploadsQuerySchema = {
-  $id: 'UploadsQuery',
-  type: 'object',
-  additionalProperties: true,
-  properties: {
-    ...querySyntax(uploadsSchema.properties)
-  }
+	$id: 'UploadsQuery',
+	type: 'object',
+	additionalProperties: true,
+	properties: {
+		...querySyntax(uploadsSchema.properties),
+	},
 } as const
 export type UploadsQuery = FromSchema<typeof uploadsQuerySchema>
 export const uploadsQueryValidator = getValidator(uploadsQuerySchema, queryValidator)

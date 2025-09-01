@@ -7,8 +7,8 @@ import type { Application } from '../declarations'
 
 export const services = (app: Application) => {
   app.configure(roles)
-  app.configure(uploads)
-  app.configure(profile)
-  app.configure(users)
-  // All services will be registered here
+	app.configure(uploads)
+	app.configure(profile)
+	app.configure(users)
+	// All services will be registered here
 }
