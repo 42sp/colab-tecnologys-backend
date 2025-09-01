@@ -18,7 +18,7 @@ export const profileSchema = {
 		id: { type: 'string', format: 'uuid' },
 		name: { type: 'string' },
 		date_of_birth: { type: 'string', format: 'date' },
-		cpf: { type: 'string' },
+		email: { type: 'string', format: 'email' },
 		registration_code: { type: 'string' },
 		phone: { type: 'string' },
 		photo: { type: 'string' },
@@ -45,7 +45,7 @@ export const profileDataSchema = {
 	required: [
 		'name',
 		'date_of_birth',
-		'cpf',
+		'email',
 		'registration_code',
 		'phone',
 		'address',

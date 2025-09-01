@@ -14,10 +14,10 @@ export const usersSchema = {
 	$id: 'Users',
 	type: 'object',
 	additionalProperties: false,
-	required: ['id', 'email', 'password'],
+	required: ['id', 'cpf', 'password'],
 	properties: {
 		id: { type: 'string', format: 'uuid' },
-		email: { type: 'string', format: 'email' },
+		cpf: { type: 'string' },
 		password: { type: 'string' },
 		profile_id: { type: 'string', format: 'uuid' },
 		role_id: { type: 'string', format: 'uuid' },
@@ -40,7 +40,7 @@ export const usersDataSchema = {
 	$id: 'UsersData',
 	type: 'object',
 	additionalProperties: false,
-	required: ['email', 'password'],
+	required: ['cpf', 'password'],
 	properties: {
 		...usersSchema.properties,
 	},
