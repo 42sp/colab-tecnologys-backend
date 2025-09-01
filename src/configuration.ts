@@ -41,7 +41,7 @@ export const configAuthentication = {
 		expiresIn: '1d',
 	},
 	local: {
-		usernameField: 'email',
+		usernameField: 'cpf',
 		passwordField: 'password',
 		errorMessage: 'You are not authenticated',
 	},
