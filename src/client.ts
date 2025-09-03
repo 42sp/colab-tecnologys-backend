@@ -4,6 +4,14 @@ import type { TransportConnection, Application } from '@feathersjs/feathers'
 import authenticationClient from '@feathersjs/authentication-client'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
+import { passwordRecoveryClient } from './services/password-recovery/password-recovery.shared'
+export type {
+	PasswordRecovery,
+	PasswordRecoveryData,
+	PasswordRecoveryQuery,
+	PasswordRecoveryPatch,
+} from './services/password-recovery/password-recovery.shared'
+
 import { rolesClient } from './services/roles/roles.shared'
 export type { Roles, RolesData, RolesQuery, RolesPatch } from './services/roles/roles.shared'
 
@@ -55,6 +63,7 @@ export const createClient = <Configuration = any>(
 	client.configure(usersClient)
 	client.configure(profileClient)
 	client.configure(uploadsClient)
-  client.configure(rolesClient)
+	client.configure(rolesClient)
+	client.configure(passwordRecoveryClient)
 	return client
 }

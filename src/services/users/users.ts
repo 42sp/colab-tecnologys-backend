@@ -63,6 +63,12 @@ export const users = (app: Application) => {
 		},
 		after: {
 			all: [],
+			// get: [
+			// 	async (context) => {
+			// 		context.result = {...context.result, profile: ""}
+			// 		return context
+			// 	}
+			// ]
 		},
 		error: {
 			all: [],
