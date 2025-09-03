@@ -42,17 +42,7 @@ export const profileDataSchema = {
 	$id: 'ProfileData',
 	type: 'object',
 	additionalProperties: false,
-	required: [
-		'name',
-		'date_of_birth',
-		'email',
-		'registration_code',
-		'phone',
-		'address',
-		'city',
-		'state',
-		'postcode',
-	],
+	required: ['name', 'date_of_birth', 'email', 'phone', 'address', 'city', 'state', 'postcode'],
 	properties: {
 		...profileSchema.properties,
 	},
