@@ -4,21 +4,20 @@ import type { ClientApplication } from '../../client'
 import type {
 	PasswordRecovery,
 	PasswordRecoveryData,
-	PasswordRecoveryPatch,
-	PasswordRecoveryQuery,
 	PasswordRecoveryService,
 } from './password-recovery.class'
 
-export type { PasswordRecovery, PasswordRecoveryData, PasswordRecoveryPatch, PasswordRecoveryQuery }
+export type { PasswordRecovery, PasswordRecoveryData }
 
+// Como não temos queries, usamos Params sem tipo específico
 export type PasswordRecoveryClientService = Pick<
-	PasswordRecoveryService<Params<PasswordRecoveryQuery>>,
+	PasswordRecoveryService<Params>,
 	(typeof passwordRecoveryMethods)[number]
 >
 
 export const passwordRecoveryPath = 'password-recovery'
 
-export const passwordRecoveryMethods: Array<keyof PasswordRecoveryService> = ['create']
+export const passwordRecoveryMethods = ['create'] as const
 
 export const passwordRecoveryClient = (client: ClientApplication) => {
 	const connection = client.get('connection')

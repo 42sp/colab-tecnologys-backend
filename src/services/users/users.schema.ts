@@ -9,6 +9,7 @@ import type { UsersService } from './users.class'
 import { v4 as uuidv4 } from 'uuid'
 import { passwordHash } from '@feathersjs/authentication-local'
 import { isValidCPF } from './users.utils'
+import { BadRequest } from '@feathersjs/errors'
 
 // Main data model schema
 export const usersSchema = {
@@ -79,7 +80,7 @@ export const usersPatchResolver = resolve<UsersPatch, HookContext<UsersService>>
 	cpf: async (value) => {
 		if (value) {
 			const cpfDigits = value.replace(/\D/g, '')
-			if (!isValidCPF(cpfDigits)) throw new Error('CPF inválido')
+			if (!isValidCPF(cpfDigits)) throw new BadRequest('Invalid CPF')
 
 			return cpfDigits
 		}
