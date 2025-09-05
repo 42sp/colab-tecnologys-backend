@@ -29,8 +29,9 @@ const app: Application = express(feathers())
 // Load app configuration
 app.configure(configuration(configurationValidator))
 app.use(cors())
-app.use(json())
-app.use(urlencoded({ extended: true }))
+
+app.use(json({ limit: '500kb' }))
+app.use(urlencoded({ extended: true, limit: '500kb' }))
 // Host the public folder
 app.use('/', serveStatic(app.get('public')))
 
