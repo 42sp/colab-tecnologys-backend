@@ -8,8 +8,6 @@ import { passwordRecoveryClient } from './services/password-recovery/password-re
 export type {
 	PasswordRecovery,
 	PasswordRecoveryData,
-	PasswordRecoveryQuery,
-	PasswordRecoveryPatch,
 } from './services/password-recovery/password-recovery.shared'
 
 import { rolesClient } from './services/roles/roles.shared'
