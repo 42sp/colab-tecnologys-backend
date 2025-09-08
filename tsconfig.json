@@ -10,9 +10,7 @@
     "declaration": true,
     "strict": true,
     "esModuleInterop": true,
-    "sourceMap": true,
-    "allowImportingTsExtensions": true,
-    "noEmit": true
+    "sourceMap": true
   },
   "include": [
     "src"
