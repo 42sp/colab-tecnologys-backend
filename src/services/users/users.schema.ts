@@ -1,83 +1,108 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
-import { resolve, getValidator, querySyntax } from '@feathersjs/schema'
+import { resolve, getValidator, querySyntax, queryProperties } from '@feathersjs/schema'
 import type { FromSchema } from '@feathersjs/schema'
-import { passwordHash } from '@feathersjs/authentication-local'
 
 import type { HookContext } from '../../declarations'
 import { dataValidator, queryValidator } from '../../validators'
-import type { UserService } from './users.class'
+import type { UsersService } from './users.class'
+
+import { v4 as uuidv4 } from 'uuid'
+import { passwordHash } from '@feathersjs/authentication-local'
+import { isValidCPF } from './users.utils'
+import { BadRequest } from '@feathersjs/errors'
 
 // Main data model schema
-export const userSchema = {
-  $id: 'User',
-  type: 'object',
-  additionalProperties: false,
-  required: ['id', 'email'],
-  properties: {
-    id: { type: 'number' },
-    email: { type: 'string' },
-    password: { type: 'string' }
-  }
+export const usersSchema = {
+	$id: 'Users',
+	type: 'object',
+	additionalProperties: false,
+	required: ['id', 'cpf', 'password'],
+	properties: {
+		id: { type: 'string', format: 'uuid' },
+		cpf: { type: 'string' },
+		password: { type: 'string' },
+		profile_id: { type: 'string', format: 'uuid' },
+		role_id: { type: 'string', format: 'uuid' },
+		is_active: { type: 'boolean' },
+		is_available: { type: 'boolean' },
+		created_at: { type: 'string', format: 'date-time' },
+		updated_at: { type: 'string', format: 'date-time' },
+	},
 } as const
-export type User = FromSchema<typeof userSchema>
-export const userValidator = getValidator(userSchema, dataValidator)
-export const userResolver = resolve<User, HookContext<UserService>>({})
+export type Users = FromSchema<typeof usersSchema>
+export const usersValidator = getValidator(usersSchema, dataValidator)
+export const usersResolver = resolve<Users, HookContext<UsersService>>({})
 
-export const userExternalResolver = resolve<User, HookContext<UserService>>({
-  // The password should never be visible externally
-  password: async () => undefined
+export const usersExternalResolver = resolve<Users, HookContext<UsersService>>({
+	password: async () => undefined,
 })
 
 // Schema for creating new data
-export const userDataSchema = {
-  $id: 'UserData',
-  type: 'object',
-  additionalProperties: false,
-  required: ['email'],
-  properties: {
-    ...userSchema.properties
-  }
+export const usersDataSchema = {
+	$id: 'UsersData',
+	type: 'object',
+	additionalProperties: false,
+	required: ['cpf', 'password'],
+	properties: {
+		...usersSchema.properties,
+	},
 } as const
-export type UserData = FromSchema<typeof userDataSchema>
-export const userDataValidator = getValidator(userDataSchema, dataValidator)
-export const userDataResolver = resolve<UserData, HookContext<UserService>>({
-  password: passwordHash({ strategy: 'local' })
+export type UsersData = FromSchema<typeof usersDataSchema>
+export const usersDataValidator = getValidator(usersDataSchema, dataValidator)
+export const usersDataResolver = resolve<UsersData, HookContext<UsersService>>({
+	id: async () => uuidv4(),
+	password: passwordHash({ strategy: 'local' }),
+	cpf: async (value) => {
+		if (!value) throw new Error('CPF é obrigatório')
+
+		const cpfDigits = value.replace(/\D/g, '')
+		if (!isValidCPF(cpfDigits)) throw new Error('CPF inválido')
+
+		return cpfDigits
+	},
 })
 
 // Schema for updating existing data
-export const userPatchSchema = {
-  $id: 'UserPatch',
-  type: 'object',
-  additionalProperties: false,
-  required: [],
-  properties: {
-    ...userSchema.properties
-  }
+export const usersPatchSchema = {
+	$id: 'UsersPatch',
+	type: 'object',
+	additionalProperties: false,
+	required: [],
+	properties: {
+		...usersSchema.properties,
+	},
 } as const
-export type UserPatch = FromSchema<typeof userPatchSchema>
-export const userPatchValidator = getValidator(userPatchSchema, dataValidator)
-export const userPatchResolver = resolve<UserPatch, HookContext<UserService>>({
-  password: passwordHash({ strategy: 'local' })
+export type UsersPatch = FromSchema<typeof usersPatchSchema>
+export const usersPatchValidator = getValidator(usersPatchSchema, dataValidator)
+export const usersPatchResolver = resolve<UsersPatch, HookContext<UsersService>>({
+	password: passwordHash({ strategy: 'local' }),
+	updated_at: async () => new Date().toISOString(),
+	cpf: async (value) => {
+		if (value) {
+			const cpfDigits = value.replace(/\D/g, '')
+			if (!isValidCPF(cpfDigits)) throw new BadRequest('Invalid CPF')
+
+			return cpfDigits
+		}
+	},
 })
 
 // Schema for allowed query properties
-export const userQuerySchema = {
-  $id: 'UserQuery',
-  type: 'object',
-  additionalProperties: false,
-  properties: {
-    ...querySyntax(userSchema.properties)
-  }
+export const usersQuerySchema = {
+	$id: 'UsersQuery',
+	type: 'object',
+	additionalProperties: false,
+	properties: {
+		...querySyntax(usersSchema.properties),
+	},
 } as const
-export type UserQuery = FromSchema<typeof userQuerySchema>
-export const userQueryValidator = getValidator(userQuerySchema, queryValidator)
-export const userQueryResolver = resolve<UserQuery, HookContext<UserService>>({
-  // If there is a user (e.g. with authentication), they are only allowed to see their own data
-  id: async (value, user, context) => {
-    if (context.params.user) {
-      return context.params.user.id
-    }
-
-    return value
-  }
+export type UsersQuery = FromSchema<typeof usersQuerySchema>
+export const usersQueryValidator = getValidator(usersQuerySchema, queryValidator)
+export const usersQueryResolver = resolve<UsersQuery, HookContext<UsersService>>({
+	id: async (value, _, context) => {
+		if (context.params.user) {
+			return context.params.user.id
+		}
+		return value
+	},
 })

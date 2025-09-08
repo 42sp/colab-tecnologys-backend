@@ -4,24 +4,24 @@ import { KnexService } from '@feathersjs/knex'
 import type { KnexAdapterParams, KnexAdapterOptions } from '@feathersjs/knex'
 
 import type { Application } from '../../declarations'
-import type { Users, UsersData, UsersPatch, UsersQuery } from './users.schema'
+import type { Roles, RolesData, RolesPatch, RolesQuery } from './roles.schema'
 
-export type { Users, UsersData, UsersPatch, UsersQuery }
+export type { Roles, RolesData, RolesPatch, RolesQuery }
 
-export interface UsersParams extends KnexAdapterParams<UsersQuery> {}
+export interface RolesParams extends KnexAdapterParams<RolesQuery> {}
 
 // By default calls the standard Knex adapter service methods but can be customized with your own functionality.
-export class UsersService<ServiceParams extends Params = UsersParams> extends KnexService<
-	Users,
-	UsersData,
-	UsersParams,
-	UsersPatch
+export class RolesService<ServiceParams extends Params = RolesParams> extends KnexService<
+  Roles,
+  RolesData,
+  RolesParams,
+  RolesPatch
 > {}
 
 export const getOptions = (app: Application): KnexAdapterOptions => {
-	return {
-		paginate: app.get('paginate'),
-		Model: app.get('postgresqlClient'),
-		name: 'users',
-	}
+  return {
+    paginate: app.get('paginate'),
+    Model: app.get('postgresqlClient'),
+    name: 'roles'
+  }
 }

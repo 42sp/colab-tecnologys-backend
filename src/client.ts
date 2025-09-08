@@ -4,11 +4,38 @@ import type { TransportConnection, Application } from '@feathersjs/feathers'
 import authenticationClient from '@feathersjs/authentication-client'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
-import { userClient } from './services/users/users.shared'
-export type { User, UserData, UserQuery, UserPatch } from './services/users/users.shared'
+import { passwordRecoveryClient } from './services/password-recovery/password-recovery.shared'
+export type {
+	PasswordRecovery,
+	PasswordRecoveryData,
+	PasswordRecoveryQuery,
+	PasswordRecoveryPatch,
+} from './services/password-recovery/password-recovery.shared'
+
+import { rolesClient } from './services/roles/roles.shared'
+export type { Roles, RolesData, RolesQuery, RolesPatch } from './services/roles/roles.shared'
+
+import { uploadsClient } from './services/uploads/uploads.shared'
+export type {
+	Uploads,
+	UploadsData,
+	UploadsQuery,
+	UploadsPatch,
+} from './services/uploads/uploads.shared'
+
+import { profileClient } from './services/profile/profile.shared'
+export type {
+	Profile,
+	ProfileData,
+	ProfileQuery,
+	ProfilePatch,
+} from './services/profile/profile.shared'
+
+import { usersClient } from './services/users/users.shared'
+export type { Users, UsersData, UsersQuery, UsersPatch } from './services/users/users.shared'
 
 export interface Configuration {
-  connection: TransportConnection<ServiceTypes>
+	connection: TransportConnection<ServiceTypes>
 }
 
 export interface ServiceTypes {}
@@ -23,16 +50,20 @@ export type ClientApplication = Application<ServiceTypes, Configuration>
  * @see https://dove.feathersjs.com/api/client.html
  * @returns The Feathers client application
  */
-export const createClient = <Configuration = any,>(
-  connection: TransportConnection<ServiceTypes>,
-  authenticationOptions: Partial<AuthenticationClientOptions> = {}
+export const createClient = <Configuration = any>(
+	connection: TransportConnection<ServiceTypes>,
+	authenticationOptions: Partial<AuthenticationClientOptions> = {},
 ) => {
-  const client: ClientApplication = feathers()
+	const client: ClientApplication = feathers()
 
-  client.configure(connection)
-  client.configure(authenticationClient(authenticationOptions))
-  client.set('connection', connection)
+	client.configure(connection)
+	client.configure(authenticationClient(authenticationOptions))
+	client.set('connection', connection)
 
-  client.configure(userClient)
-  return client
+	client.configure(usersClient)
+	client.configure(profileClient)
+	client.configure(uploadsClient)
+	client.configure(rolesClient)
+	client.configure(passwordRecoveryClient)
+	return client
 }
