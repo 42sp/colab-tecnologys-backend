@@ -1,3 +1,4 @@
+import { tasks } from './tasks/tasks'
 import { serviceTypes } from './service-types/service-types'
 import { services as jobs } from './services/services'
 import { passwordRecovery } from './password-recovery/password-recovery'
@@ -9,6 +10,7 @@ import { users } from './users/users'
 import type { Application } from '../declarations'
 
 export const services = (app: Application) => {
+  app.configure(tasks)
   app.configure(serviceTypes)
   app.configure(jobs)
   app.configure(passwordRecovery)

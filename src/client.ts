@@ -4,6 +4,9 @@ import type { TransportConnection, Application } from '@feathersjs/feathers'
 import authenticationClient from '@feathersjs/authentication-client'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
+import { tasksClient } from './services/tasks/tasks.shared'
+export type { Tasks, TasksData, TasksQuery, TasksPatch } from './services/tasks/tasks.shared'
+
 import { serviceTypesClient } from './services/service-types/service-types.shared'
 export type {
   ServiceTypes,
@@ -71,5 +74,6 @@ export const createClient = <Configuration = any,>(
   client.configure(passwordRecoveryClient)
   client.configure(servicesClient)
   client.configure(serviceTypesClient)
+  client.configure(tasksClient)
   return client
 }
