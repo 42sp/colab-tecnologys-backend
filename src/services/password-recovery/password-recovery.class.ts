@@ -72,22 +72,10 @@ export class PasswordRecoveryService<
 				throw new BadRequest('User not Found', error)
 			})
 
-		const profile = await app
-			.service('profile')
-			.find({
-				query: { id: user[0].id },
-				paginate: false,
-			})
-			.catch((error) => {
-				throw new BadRequest('Profile not Found', error)
-			})
-
 		const token = await this.generateJwtToken(user[0].id)
 
 		return {
 			accessToken: token,
-			userId: user[0].id,
-			phone: profile[0].phone,
 		}
 	}
 
