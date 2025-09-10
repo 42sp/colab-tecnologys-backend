@@ -25,8 +25,8 @@ export type {
 
 import { passwordRecoveryClient } from './services/password-recovery/password-recovery.shared'
 export type {
-  PasswordRecovery,
-  PasswordRecoveryData
+	PasswordRecovery,
+	PasswordRecoveryData,
 } from './services/password-recovery/password-recovery.shared'
 
 import { rolesClient } from './services/roles/roles.shared'
