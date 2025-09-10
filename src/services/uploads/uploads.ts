@@ -61,7 +61,7 @@ export const uploads = (app: Application) => {
 			remove: [],
 		},
 		after: {
-			all: [saveImage],
+			create: [saveImage],
 		},
 		error: {
 			all: [],

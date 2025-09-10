@@ -7,11 +7,13 @@ export const saveImage = async (context: HookContext) => {
 
 	try {
 		const profileService = context.app.service('profile')
+		const uploadsService = context.app.service('uploads')
 
 		const userProfile = await profileService.find({
 			user: context.params.user,
 		  })
 		const currentProfile = userProfile.data[0]
+		const oldPhoto = currentProfile.photo
 
 		await profileService.patch(
 			currentProfile.id,
@@ -20,6 +22,15 @@ export const saveImage = async (context: HookContext) => {
 			},
 			context.params,
 		)
+
+		if (oldPhoto && oldPhoto !== context.result.id) {
+			try {
+				await uploadsService.remove(oldPhoto, context.params)
+			} catch (removeErr) {
+				console.error('Error removing image:', removeErr)
+			}
+		}
+
 
 	} catch (error) {
 		console.error('Error save image avatar:', error)

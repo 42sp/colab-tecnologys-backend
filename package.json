@@ -42,12 +42,13 @@
 		"mocha": "cross-env NODE_ENV=test mocha test/ --require ts-node/register --recursive --extension .ts --exit",
 		"test": "cross-env NODE_ENV=test npm run migrate && npm run mocha",
 		"bundle:client": "npm run compile && npm pack --pack-destination ./public",
-		"migrate": "dotenvx run --env-file=.env -- knex migrate:latest",
-		"migrate:up": "dotenvx run --env-file=.env -- knex migrate:up",
-		"migrate:down": "dotenvx run --env-file=.env -- knex migrate:down",
-		"migrate:make": "dotenvx run -f .env -- knex migrate:make",
-		"migrate:rollback": "dotenvx run --env-file=.env -- knex migrate:rollback",
-		"migrate:list": "dotenvx run --env-file=.env -- knex migrate:list"
+		"knex": "node --import tsx --env-file=.env ./node_modules/knex/bin/cli.js",
+		"migrate": "npm run knex -- migrate:latest",
+		"migrate:up": "npm run knex -- migrate:up",
+		"migrate:down": "npm run knex -- migrate:down",
+		"migrate:make": "npm run knex -- migrate:make",
+		"migrate:rollback": "npm run knex -- migrate:rollback",
+		"migrate:list": "npm run knex -- migrate:list"
 	},
 	"dependencies": {
 		"@dotenvx/dotenvx": "^1.48.4",
