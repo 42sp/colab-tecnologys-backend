@@ -43,6 +43,7 @@ export const servicesSchema = {
 		is_done: { type: 'boolean', default: false },
 		created_at: { type: 'string', format: 'date-time' },
 		updated_at: { type: 'string', format: 'date-time' },
+		acronym: { type: 'string', maxLength: 2}
 	},
 } as const
 export type Services = FromSchema<typeof servicesSchema>
@@ -56,7 +57,7 @@ export const servicesDataSchema = {
 	$id: 'ServicesData',
 	type: 'object',
 	additionalProperties: false,
-	required: ['service_type_id', 'work_id'],
+	required: ['service_type_id', 'work_id', 'acronym'],
 	properties: {
 		...servicesSchema.properties,
 	},
