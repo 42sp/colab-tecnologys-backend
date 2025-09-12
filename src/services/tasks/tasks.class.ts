@@ -12,16 +12,16 @@ export interface TasksParams extends KnexAdapterParams<TasksQuery> {}
 
 // By default calls the standard Knex adapter service methods but can be customized with your own functionality.
 export class TasksService<ServiceParams extends Params = TasksParams> extends KnexService<
-  Tasks,
-  TasksData,
-  TasksParams,
-  TasksPatch
+	Tasks,
+	TasksData,
+	TasksParams,
+	TasksPatch
 > {}
 
 export const getOptions = (app: Application): KnexAdapterOptions => {
-  return {
-    paginate: app.get('paginate'),
-    Model: app.get('postgresqlClient'),
-    name: 'tasks'
-  }
+	return {
+		paginate: app.get('paginate'),
+		Model: app.get('postgresqlClient'),
+		name: 'tasks',
+	}
 }

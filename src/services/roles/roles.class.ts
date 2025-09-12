@@ -12,16 +12,16 @@ export interface RolesParams extends KnexAdapterParams<RolesQuery> {}
 
 // By default calls the standard Knex adapter service methods but can be customized with your own functionality.
 export class RolesService<ServiceParams extends Params = RolesParams> extends KnexService<
-  Roles,
-  RolesData,
-  RolesParams,
-  RolesPatch
+	Roles,
+	RolesData,
+	RolesParams,
+	RolesPatch
 > {}
 
 export const getOptions = (app: Application): KnexAdapterOptions => {
-  return {
-    paginate: app.get('paginate'),
-    Model: app.get('postgresqlClient'),
-    name: 'roles'
-  }
+	return {
+		paginate: app.get('paginate'),
+		Model: app.get('postgresqlClient'),
+		name: 'roles',
+	}
 }
