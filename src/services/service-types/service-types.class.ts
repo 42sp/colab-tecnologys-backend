@@ -21,9 +21,9 @@ export class ServiceTypesService<
 > extends KnexService<ServiceTypes, ServiceTypesData, ServiceTypesParams, ServiceTypesPatch> {}
 
 export const getOptions = (app: Application): KnexAdapterOptions => {
-	return {
-		paginate: app.get('paginate'),
-		Model: app.get('postgresqlClient'),
-		name: 'service-types',
-	}
+  return {
+    paginate: app.get('paginate'),
+    Model: app.get('postgresqlClient'),
+    name: 'service_types'
+  }
 }
