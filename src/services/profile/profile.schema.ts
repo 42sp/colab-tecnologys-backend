@@ -86,8 +86,8 @@ export const profileQuerySchema = {
 export type ProfileQuery = FromSchema<typeof profileQuerySchema>
 export const profileQueryValidator = getValidator(profileQuerySchema, queryValidator)
 export const profileQueryResolver = resolve<ProfileQuery, HookContext<ProfileService>>({
-	user_id: async (_value, _data, context) => {
-		if (!context.params.user?.id) throw new Error('Unauthorized')
-		return context.params.user.id
-	},
+	// user_id: async (_value, _data, context) => {
+	// 	if (!context.params.user?.id) throw new Error('Unauthorized')
+	// 	return context.params.user.id
+	// },
 })
