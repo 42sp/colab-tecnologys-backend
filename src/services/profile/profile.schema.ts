@@ -81,6 +81,10 @@ export const profileQuerySchema = {
 	additionalProperties: false,
 	properties: {
 		...querySyntax(profileSchema.properties),
+		list_workers: {
+			type: 'string',
+			enum: ['true']
+		},
 	},
 } as const
 export type ProfileQuery = FromSchema<typeof profileQuerySchema>
