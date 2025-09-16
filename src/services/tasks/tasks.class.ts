@@ -20,7 +20,8 @@ export class TasksService<ServiceParams extends Params = TasksParams> extends Kn
 
 export const getOptions = (app: Application): KnexAdapterOptions => {
 	return {
-		paginate: app.get('paginate'),
+		// paginate: app.get('paginate'),
+		paginate: false,
 		Model: app.get('postgresqlClient'),
 		name: 'tasks',
 	}

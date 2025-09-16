@@ -8,7 +8,6 @@ import { BadRequest } from '@feathersjs/errors'
 import jwt, { Algorithm } from 'jsonwebtoken'
 import { configAuthentication } from '../../configuration'
 import { app } from '../../app'
-import { error } from 'console'
 
 export type { PasswordRecovery, PasswordRecoveryData }
 
