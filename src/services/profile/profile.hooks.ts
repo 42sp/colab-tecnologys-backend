@@ -43,7 +43,7 @@ export const fetchWorkerProfiles = async (context: HookContext)=> {
 		const profilesResponse = await profileService.find({
 		  query: {
 			user_id: { $in: workerUserIds },
-			$select: ['id', 'name']
+			$select: ['user_id', 'name']
 		  },
 		  paginate: false,
 		}, params);
