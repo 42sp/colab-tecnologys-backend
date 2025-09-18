@@ -45,13 +45,21 @@ export class PasswordRecoveryService<
 			query: { cpf },
 		})
 		if (!user || !user.data[0]) throw new BadRequest('User Not Found')
-
+			const profile = await app
+		.service("profile")
+		.find({
+			query: { user_id: user.data[0].id }
+		})
+		.catch((error) => {
+			throw new BadRequest('Profile not Found', error)
+		})
 		// [REGRA DE NEGÓCIO] - Gerar código de recuperação
 		// [REGRA DE NEGÓCIO] - Enviar código por SMS
 
 		return {
 			code: '123456',
 			userId: user.data[0].id,
+			phone: profile.data[0].phone
 		}
 	}
 
@@ -72,9 +80,16 @@ export class PasswordRecoveryService<
 			})
 
 		const token = await this.generateJwtToken(user[0].id)
+		const decodedPayload = jwt.decode(token);
+
+		if (!decodedPayload || typeof decodedPayload === 'string') {
+			throw new Error('Failed to decode JWT token.');
+		}
 
 		return {
 			accessToken: token,
+			exp: decodedPayload.exp,
+            sub: decodedPayload.sub,
 		}
 	}
 
