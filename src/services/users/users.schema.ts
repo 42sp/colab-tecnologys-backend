@@ -16,7 +16,7 @@ export const usersSchema = {
 	$id: 'Users',
 	type: 'object',
 	additionalProperties: false,
-	required: ['id', 'cpf', 'password'],
+	required: ['id', 'cpf', 'password', 'role_id'],
 	properties: {
 		id: { type: 'string', format: 'uuid' },
 		cpf: { type: 'string' },
@@ -42,7 +42,7 @@ export const usersDataSchema = {
 	$id: 'UsersData',
 	type: 'object',
 	additionalProperties: false,
-	required: ['cpf', 'password'],
+	required: ['cpf', 'password', 'role_id'],
 	properties: {
 		...usersSchema.properties,
 	},
@@ -53,10 +53,10 @@ export const usersDataResolver = resolve<UsersData, HookContext<UsersService>>({
 	id: async () => uuidv4(),
 	password: passwordHash({ strategy: 'local' }),
 	cpf: async (value) => {
-		if (!value) throw new Error('CPF é obrigatório')
+		if (!value) throw new BadRequest('CPF is required')
 
 		const cpfDigits = value.replace(/\D/g, '')
-		if (!isValidCPF(cpfDigits)) throw new Error('CPF inválido')
+		if (!isValidCPF(cpfDigits)) throw new BadRequest('CPF is invalid')
 
 		return cpfDigits
 	},
@@ -80,7 +80,7 @@ export const usersPatchResolver = resolve<UsersPatch, HookContext<UsersService>>
 	cpf: async (value) => {
 		if (value) {
 			const cpfDigits = value.replace(/\D/g, '')
-			if (!isValidCPF(cpfDigits)) throw new BadRequest('Invalid CPF')
+			if (!isValidCPF(cpfDigits)) throw new BadRequest('CPF is invalid')
 
 			return cpfDigits
 		}
