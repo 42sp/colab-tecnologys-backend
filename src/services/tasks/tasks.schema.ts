@@ -7,7 +7,6 @@ import { dataValidator, queryValidator } from '../../validators'
 import type { TasksService } from './tasks.class'
 
 import { v4 as uuidv4 } from 'uuid'
-import { query } from 'winston'
 
 // Main data model schema
 export const tasksSchema = {
@@ -119,8 +118,6 @@ export const tasksDataResolver = resolve<TasksData, HookContext<TasksService>>({
 		const service = await context.app.service('services').get(data.service_id)
 		if (!service) throw new Error('Service not found')
 
-		console.log('Service fetched:', service)
-
 		const serviceType = await context.app.service('service-types').get(service.service_type_id)
 		if (!serviceType) throw new Error('Service type not found')
 
@@ -156,8 +153,12 @@ export const tasksQuerySchema = {
 export type TasksQuery = FromSchema<typeof tasksQuerySchema>
 export const tasksQueryValidator = getValidator(tasksQuerySchema, queryValidator)
 export const tasksQueryResolver = resolve<TasksQuery, HookContext<TasksService>>({
-	worker_id: async (_value, _data, context) => {
-		if (!context.params.user?.id) throw new Error('Unauthorized')
-		return context.params.user.id
+	worker_id: async (value, _, context) => {
+		if (!context.params.user?.role_id) throw new Error('Role not found')
+		const role = await context.app.service('roles').get(context.params.user.role_id)
+
+		if (role.hierarchy_level < 50) return context.params.user.id
+
+		return value || undefined
 	},
 })
