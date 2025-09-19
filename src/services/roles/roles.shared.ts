@@ -5,23 +5,26 @@ import type { Roles, RolesData, RolesPatch, RolesQuery, RolesService } from './r
 
 export type { Roles, RolesData, RolesPatch, RolesQuery }
 
-export type RolesClientService = Pick<RolesService<Params<RolesQuery>>, (typeof rolesMethods)[number]>
+export type RolesClientService = Pick<
+	RolesService<Params<RolesQuery>>,
+	(typeof rolesMethods)[number]
+>
 
 export const rolesPath = 'roles'
 
 export const rolesMethods: Array<keyof RolesService> = ['find', 'get', 'create', 'patch', 'remove']
 
 export const rolesClient = (client: ClientApplication) => {
-  const connection = client.get('connection')
+	const connection = client.get('connection')
 
-  client.use(rolesPath, connection.service(rolesPath), {
-    methods: rolesMethods
-  })
+	client.use(rolesPath, connection.service(rolesPath), {
+		methods: rolesMethods,
+	})
 }
 
 // Add this service to the client service type index
 declare module '../../client' {
-  interface ServiceTypes {
-    [rolesPath]: RolesClientService
-  }
+	interface ServiceTypes {
+		[rolesPath]: RolesClientService
+	}
 }

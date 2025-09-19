@@ -3,9 +3,9 @@ import assert from 'assert'
 import { app } from '../../../src/app'
 
 describe('password-recovery service', () => {
-  it('registered the service', () => {
-    const service = app.service('password-recovery')
+	it('registered the service', () => {
+		const service = app.service('password-recovery')
 
-    assert.ok(service, 'Registered the service')
-  })
+		assert.ok(service, 'Registered the service')
+	})
 })

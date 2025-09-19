@@ -1,3 +1,4 @@
+import { constructions } from './constructions/constructions'
 import { tasks } from './tasks/tasks'
 import { serviceTypes } from './service-types/service-types'
 import { services as jobs } from './services/services'
@@ -10,13 +11,14 @@ import { users } from './users/users'
 import type { Application } from '../declarations'
 
 export const services = (app: Application) => {
-  app.configure(tasks)
-  app.configure(serviceTypes)
-  app.configure(jobs)
-  app.configure(passwordRecovery)
-  app.configure(roles)
-  app.configure(uploads)
-  app.configure(profile)
-  app.configure(users)
-  // All services will be registered here
+	app.configure(constructions)
+	app.configure(tasks)
+	app.configure(serviceTypes)
+	app.configure(jobs)
+	app.configure(passwordRecovery)
+	app.configure(roles)
+	app.configure(uploads)
+	app.configure(profile)
+	app.configure(users)
+	// All services will be registered here
 }

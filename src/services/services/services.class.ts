@@ -12,15 +12,15 @@ export interface ServicesParams extends KnexAdapterParams<ServicesQuery> {}
 
 // By default calls the standard Knex adapter service methods but can be customized with your own functionality.
 export class ServicesService<ServiceParams extends Params = ServicesParams> extends KnexService<
-  Services,
-  ServicesData,
-  ServicesParams,
-  ServicesPatch
+	Services,
+	ServicesData,
+	ServicesParams,
+	ServicesPatch
 > {}
 
 export const getOptions = (app: Application): KnexAdapterOptions => {
   return {
-    paginate: app.get('paginate'),
+    paginate: false,
     Model: app.get('postgresqlClient'),
     name: 'services'
   }

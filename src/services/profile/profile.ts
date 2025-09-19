@@ -17,7 +17,7 @@ import {
 import type { Application } from '../../declarations'
 import { ProfileService, getOptions } from './profile.class'
 import { profilePath, profileMethods } from './profile.shared'
-import { saveProfileId } from './profile.hooks'
+import { saveProfileId, fetchWorkerProfiles } from './profile.hooks'
 
 export * from './profile.class'
 export * from './profile.schema'
@@ -45,7 +45,7 @@ export const profile = (app: Application) => {
 				schemaHooks.validateQuery(profileQueryValidator),
 				schemaHooks.resolveQuery(profileQueryResolver),
 			],
-			find: [],
+			find: [fetchWorkerProfiles],
 			get: [],
 			create: [
 				schemaHooks.validateData(profileDataValidator),

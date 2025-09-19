@@ -13,7 +13,15 @@ export const tasksSchema = {
 	$id: 'Tasks',
 	type: 'object',
 	additionalProperties: false,
-	required: ['service_id', 'completion_date', 'task_percentage', 'worker_id', 'status'],
+	required: [
+		'service_id',
+		'completion_date',
+		'task_percentage',
+		'worker_id',
+		'status',
+		'worker_name',
+		'construction_name',
+	],
 	properties: {
 		id: { type: 'string', format: 'uuid' },
 		service_id: { type: 'string', format: 'uuid' },
@@ -28,6 +36,15 @@ export const tasksSchema = {
 		task_percentage: { type: 'number', minimum: 0, maximum: 100 },
 		created_at: { type: 'string', format: 'date-time' },
 		updated_at: { type: 'string', format: 'date-time' },
+
+		worker_name: { type: 'string' },
+		construction_name: { type: 'string' },
+		construction_address: { type: 'string' },
+		service_tower: { type: 'string' },
+		service_apartment: { type: 'string' },
+		service_floor: { type: 'string' },
+		service_stage: { type: 'string' },
+		service_type: { type: 'string' },
 	},
 } as const
 export type Tasks = FromSchema<typeof tasksSchema>
@@ -50,6 +67,62 @@ export type TasksData = FromSchema<typeof tasksDataSchema>
 export const tasksDataValidator = getValidator(tasksDataSchema, dataValidator)
 export const tasksDataResolver = resolve<TasksData, HookContext<TasksService>>({
 	id: async () => uuidv4(),
+	worker_name: async (_, data, context) => {
+		const profile = await context.app
+			.service('profile')
+			.find({ query: { user_id: data.worker_id }, paginate: false })
+		if (!profile) throw new Error('Worker not found')
+		return profile[0].name
+	},
+	construction_name: async (_, data, context) => {
+		const service = await context.app.service('services').get(data.service_id)
+		if (!service) throw new Error('Service not found')
+		if (service.work_id === null) return 'Obra temporária'
+
+		const construction = await context.app.service('constructions').get(service.work_id)
+		if (!construction) throw new Error('Construction not found')
+
+		return construction.name
+	},
+	construction_address: async (_, data, context) => {
+		const service = await context.app.service('services').get(data.service_id)
+		if (!service) throw new Error('Service not found')
+		if (service.work_id === null) return 'Endereço temporário, 1234'
+
+		const construction = await context.app.service('constructions').get(service.work_id)
+		if (!construction) throw new Error('Construction not found')
+
+		return construction.address
+	},
+	service_tower: async (_, data, context) => {
+		const service = await context.app.service('services').get(data.service_id)
+		if (!service) throw new Error('Service not found')
+		return service.tower
+	},
+	service_apartment: async (_, data, context) => {
+		const service = await context.app.service('services').get(data.service_id)
+		if (!service) throw new Error('Service not found')
+		return service.apartment
+	},
+	service_floor: async (_, data, context) => {
+		const service = await context.app.service('services').get(data.service_id)
+		if (!service) throw new Error('Service not found')
+		return service.floor
+	},
+	service_stage: async (_, data, context) => {
+		const service = await context.app.service('services').get(data.service_id)
+		if (!service) throw new Error('Service not found')
+		return service.stage
+	},
+	service_type: async (_, data, context) => {
+		const service = await context.app.service('services').get(data.service_id)
+		if (!service) throw new Error('Service not found')
+
+		const serviceType = await context.app.service('service-types').get(service.service_type_id)
+		if (!serviceType) throw new Error('Service type not found')
+
+		return serviceType.service_name
+	},
 })
 
 // Schema for updating existing data
@@ -79,4 +152,13 @@ export const tasksQuerySchema = {
 } as const
 export type TasksQuery = FromSchema<typeof tasksQuerySchema>
 export const tasksQueryValidator = getValidator(tasksQuerySchema, queryValidator)
-export const tasksQueryResolver = resolve<TasksQuery, HookContext<TasksService>>({})
+export const tasksQueryResolver = resolve<TasksQuery, HookContext<TasksService>>({
+	worker_id: async (value, _, context) => {
+		if (!context.params.user?.role_id) throw new Error('Role not found')
+		const role = await context.app.service('roles').get(context.params.user.role_id)
+
+		if (role.hierarchy_level < 50) return context.params.user.id
+
+		return value || undefined
+	},
+})
