@@ -7,6 +7,7 @@ import { dataValidator, queryValidator } from '../../validators'
 import type { TasksService } from './tasks.class'
 
 import { v4 as uuidv4 } from 'uuid'
+import { BadRequest } from '@feathersjs/errors'
 
 // Main data model schema
 export const tasksSchema = {
@@ -154,8 +155,15 @@ export type TasksQuery = FromSchema<typeof tasksQuerySchema>
 export const tasksQueryValidator = getValidator(tasksQuerySchema, queryValidator)
 export const tasksQueryResolver = resolve<TasksQuery, HookContext<TasksService>>({
 	worker_id: async (value, _, context) => {
-		if (!context.params.user?.role_id) throw new Error('Role not found')
-		const role = await context.app.service('roles').get(context.params.user.role_id)
+		if (!context.params.user?.id) throw new BadRequest()
+
+		const profile = await context.app
+			.service('profile')
+			.find({ query: { user_id: context.params.user?.id }, paginate: false })
+			.catch(() => null)
+		if (!profile || !profile[0].role_id) throw new Error('Profile not found')
+
+		const role = await context.app.service('roles').get(profile[0].role_id)
 
 		if (role.hierarchy_level < 50) return context.params.user.id
 
