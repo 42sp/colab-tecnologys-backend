@@ -18,6 +18,7 @@ import type { Application } from '../../declarations'
 import { ProfileService, getOptions } from './profile.class'
 import { profilePath, profileMethods } from './profile.shared'
 import { saveProfileId, fetchWorkerProfiles } from './profile.hooks'
+import { BadRequest, Forbidden } from '@feathersjs/errors'
 
 export * from './profile.class'
 export * from './profile.schema'
@@ -58,6 +59,29 @@ export const profile = (app: Application) => {
 			patch: [
 				schemaHooks.validateData(profilePatchValidator),
 				schemaHooks.resolveData(profilePatchResolver),
+
+				async (context) => {
+					const { user, query } = context.params
+
+					if (!user?.id) throw new BadRequest('Unauthorized')
+					context.params.query = {
+						...query,
+						user_id: user.id,
+					}
+
+					if (context.id) {
+						const profile = await context.app
+							.service('profile')
+							.get(context.id)
+							.catch(() => null)
+
+						if (!profile || profile.user_id !== user.id) {
+							throw new Forbidden('You can only edit your own profile')
+						}
+					}
+
+					return context
+				},
 			],
 			remove: [],
 		},
