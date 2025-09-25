@@ -17,7 +17,7 @@ export type { Tasks, TasksData, TasksQuery, TasksPatch } from './services/tasks/
 
 import { serviceTypesClient } from './services/service-types/service-types.shared'
 export type {
-	ServiceTypes,
+	ServiceTypes as JobsTypes,
 	ServiceTypesData,
 	ServiceTypesQuery,
 	ServiceTypesPatch,
