@@ -89,7 +89,6 @@ export class PasswordRecoveryService<
 		return {
 			accessToken: token,
 			exp: decodedPayload.exp,
-            sub: decodedPayload.sub,
 		}
 	}
 

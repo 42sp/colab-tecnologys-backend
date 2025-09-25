@@ -16,13 +16,12 @@ export const usersSchema = {
 	$id: 'Users',
 	type: 'object',
 	additionalProperties: false,
-	required: ['id', 'cpf', 'password', 'role_id'],
+	required: ['id', 'cpf', 'password'],
 	properties: {
 		id: { type: 'string', format: 'uuid' },
 		cpf: { type: 'string' },
 		password: { type: 'string' },
 		profile_id: { type: 'string', format: 'uuid' },
-		role_id: { type: 'string', format: 'uuid' },
 		is_active: { type: 'boolean' },
 		is_available: { type: 'boolean' },
 		created_at: { type: 'string', format: 'date-time' },
@@ -42,7 +41,7 @@ export const usersDataSchema = {
 	$id: 'UsersData',
 	type: 'object',
 	additionalProperties: false,
-	required: ['cpf', 'password', 'role_id'],
+	required: ['cpf', 'password'],
 	properties: {
 		...usersSchema.properties,
 	},
