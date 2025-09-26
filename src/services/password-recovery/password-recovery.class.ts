@@ -5,8 +5,6 @@ import type { Application } from '../../declarations'
 import type { PasswordRecovery, PasswordRecoveryData } from './password-recovery.schema'
 import { BadRequest } from '@feathersjs/errors'
 
-import { app } from '../../app'
-
 export type { PasswordRecovery, PasswordRecoveryData }
 
 export interface PasswordRecoveryServiceOptions {
@@ -19,7 +17,9 @@ export class PasswordRecoveryService<
 	ServiceParams extends PasswordRecoveryParams = PasswordRecoveryParams,
 > implements ServiceInterface<PasswordRecovery, PasswordRecoveryData, ServiceParams>
 {
-	constructor(public options: PasswordRecoveryServiceOptions) {}
+	constructor(public options: PasswordRecoveryServiceOptions) {
+		this.options = options;
+	}
 
 	async create(data: PasswordRecoveryData, params?: ServiceParams): Promise<any>
 	async create(data: PasswordRecoveryData | PasswordRecoveryData[], params?: ServiceParams) {
@@ -36,11 +36,11 @@ export class PasswordRecoveryService<
 	}
 
 	private async handleCodeRequest(data: PasswordRecoveryData, params?: ServiceParams) {
-		const user = await app.service('users').find({
+		const user = await this.options.app.service('users').find({
 			query: { cpf: data.cpf },
 		})
 		if (!user || !user.data[0]) throw new BadRequest('User Not Found')
-			const profile = await app
+			const profile = await this.options.app
 		.service("profile")
 		.find({
 			query: { user_id: user.data[0].id }
