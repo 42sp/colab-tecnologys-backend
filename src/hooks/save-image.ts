@@ -1,36 +1,34 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/hook.html
 import type { HookContext } from '../declarations'
+import { BadRequest } from '@feathersjs/errors'
 
 export const saveImage = async (context: HookContext) => {
 	console.log(`Running hook save-image on ${context.path}.${context.method}`)
-	console.log('data', context.result.id)
+	console.log('upload id', context.result?.id)
 
 	try {
-		const profileService = context.app.service('profile')
-		const uploadsService = context.app.service('uploads')
+		if (!context.params.user?.id) throw new BadRequest()
+		const profilesResult = await context.app
+			.service('profile')
+			.find({ query: { user_id: context.params.user?.id }, paginate: false })
+			.catch(() => null)
 
-		const userProfile = await profileService.find({
-			user: context.params.user,
-		})
-		const currentProfile = userProfile.data[0]
-		const oldPhoto = currentProfile.photo
+		const currentProfile = Array.isArray(profilesResult) ? profilesResult[0] : null
+		const oldPhoto = currentProfile.photo as string
 
-		await profileService.patch(
-			currentProfile.id,
-			{
-				photo: context.result.id,
-			},
-			context.params,
-		)
+		await context.app
+			.service('profile')
+			.patch(currentProfile.id, { photo: context.result.id }, context.params)
 
 		if (oldPhoto && oldPhoto !== context.result.id) {
 			try {
-				await uploadsService.remove(oldPhoto, context.params)
+				await context.app.service('uploads').remove(oldPhoto, context.params)
 			} catch (removeErr) {
-				console.error('Error removing image:', removeErr)
+				console.error('Error removing previous upload:', removeErr)
 			}
 		}
 	} catch (error) {
 		console.error('Error save image avatar:', error)
 	}
+	return context
 }
