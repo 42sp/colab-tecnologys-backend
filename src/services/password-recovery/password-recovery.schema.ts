@@ -15,6 +15,7 @@ export const passwordRecoverySchema = {
 	properties: {
 		cpf: { type: 'string' },
 		code: { type: 'string' },
+		phone: { type: 'string' },
 	},
 } as const
 export type PasswordRecovery = FromSchema<typeof passwordRecoverySchema>
