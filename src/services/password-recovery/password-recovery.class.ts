@@ -5,8 +5,6 @@ import type { Application } from '../../declarations'
 import type { PasswordRecovery, PasswordRecoveryData } from './password-recovery.schema'
 import { BadRequest } from '@feathersjs/errors'
 
-import jwt, { Algorithm } from 'jsonwebtoken'
-import { configAuthentication } from '../../configuration'
 import { app } from '../../app'
 
 export type { PasswordRecovery, PasswordRecoveryData }
@@ -29,20 +27,17 @@ export class PasswordRecoveryService<
 			return Promise.all(data.map((current) => this.create(current, params)))
 		}
 
-		if (data.cpf && !data.code) {
+		if (data.cpf) {
 			// [REGRA DE NEGÓCIO] - Primeira etapa: solicitar código de recuperação
 			return this.handleCodeRequest(data, params)
-		} else if (data.cpf && data.code) {
-			// [REGRA DE NEGÓCIO] - Segunda etapa: validar código e retornar JWT
-			return this.handleCodeValidation(data, params)
-		}
+		} 
 
 		throw new BadRequest('Invalid payload for password recovery. CPF and Code are expected.')
 	}
 
-	private async handleCodeRequest({ cpf }: PasswordRecoveryData, params?: ServiceParams) {
+	private async handleCodeRequest(data: PasswordRecoveryData, params?: ServiceParams) {
 		const user = await app.service('users').find({
-			query: { cpf },
+			query: { cpf: data.cpf },
 		})
 		if (!user || !user.data[0]) throw new BadRequest('User Not Found')
 			const profile = await app
@@ -53,72 +48,32 @@ export class PasswordRecoveryService<
 		.catch((error) => {
 			throw new BadRequest('Profile not Found', error)
 		})
-		// [REGRA DE NEGÓCIO] - Gerar código de recuperação
-		// [REGRA DE NEGÓCIO] - Enviar código por SMS
+
+		var recoveryCode = this.generateRecoveryCode();
+
+		data.phone = profile.data[0].phone
 
 		return {
-			code: '123456',
-			userId: user.data[0].id,
-			phone: profile.data[0].phone
+			code: recoveryCode.code,
+			expiration: recoveryCode.expiration,
+			//expiration: new Date(new Date().getTime() + 10 * 60000), // 10 minutos
 		}
 	}
 
-	private async handleCodeValidation({ cpf, code }: PasswordRecoveryData, params?: ServiceParams) {
-		if (code != '123456') throw new BadRequest('Incorrect verification code')
-		// [REGRA DE NEGÓCIO] - Validar código no banco de dados
-		// [REGRA DE NEGÓCIO] - Verificar se o código não expirou
-		// [REGRA DE NEGÓCIO] - Marcar código como usado
+	private generateRecoveryCode(
 
-		const user = await app
-			.service('users')
-			.find({
-				query: { cpf },
-				paginate: false,
-			})
-			.catch((error) => {
-				throw new BadRequest('User not Found', error)
-			})
-
-		const token = await this.generateJwtToken(user[0].id)
-		const decodedPayload = jwt.decode(token);
-
-		if (!decodedPayload || typeof decodedPayload === 'string') {
-			throw new Error('Failed to decode JWT token.');
-		}
-
-		return {
-			accessToken: token,
-			exp: decodedPayload.exp,
-		}
+	): { code: string; expiration: string } {
+		const s = `${new Date(new Date().getTime() + 10 * 60000).toLocaleString("sv-SE", { timeZone: "America/Sao_Paulo" }).replace(" ", "T") + "." + String(new Date().getMilliseconds()).padStart(3,"0")}`;
+		return { code: this.generateSixDigitCode(), expiration: s } // 10 minutos
 	}
 
-	private async generateJwtToken(userId: string): Promise<string> {
-		const { secret, jwtOptions } = configAuthentication
-
-		const payload = {
-			code: '123456',
-			sub: userId,
-			aud: jwtOptions.audience,
-		}
-
-		return jwt.sign(payload, secret, {
-			expiresIn: '20m',
-			algorithm: jwtOptions.algorithm as Algorithm,
-		})
-	}
-
-	private async generateRecoveryCode(
-		cpf: string,
-		userId: string,
-	): Promise<{ code: string; createdAt: Date }> {
-		// [REGRA DE NEGÓCIO] - Gerar código aleatório e definir data de expiração
-		return { code: '123456', createdAt: new Date() }
-	}
-
-	private async sendSmsCode(phoneNumber: string, code: string): Promise<void> {
-		// [REGRA DE NEGÓCIO] - Integrar com serviço de SMS
+	private generateSixDigitCode(): string {
+		const code = Math.floor(100000 + Math.random() * 900000).toString();
+		return `${code.slice(0, 3)}-${code.slice(3)}`;
 	}
 }
+
+
 
 export const getOptions = (app: Application) => {
 	return { app }

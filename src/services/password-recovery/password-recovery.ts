@@ -12,6 +12,7 @@ import {
 import type { Application } from '../../declarations'
 import { PasswordRecoveryService, getOptions } from './password-recovery.class'
 import { passwordRecoveryPath, passwordRecoveryMethods } from './password-recovery.shared'
+import { sendSms } from '../../hooks/send-sms'
 
 export * from './password-recovery.class'
 export * from './password-recovery.schema'
@@ -37,7 +38,11 @@ export const passwordRecovery = (app: Application) => {
 			create: [
 				schemaHooks.validateData(passwordRecoveryDataValidator),
 				schemaHooks.resolveData(passwordRecoveryDataResolver),
+				
 			],
+		},
+		after: {
+			create: [sendSms],
 		},
 	})
 }
