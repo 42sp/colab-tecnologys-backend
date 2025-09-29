@@ -53,6 +53,7 @@ export const uploads = (app: Application) => {
 			create: [
 				schemaHooks.validateData(uploadsDataValidator),
 				schemaHooks.resolveData(uploadsDataResolver),
+				
 			],
 			patch: [
 				schemaHooks.validateData(uploadsPatchValidator),

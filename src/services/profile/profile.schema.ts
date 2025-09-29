@@ -13,13 +13,12 @@ export const profileSchema = {
 	$id: 'Profile',
 	type: 'object',
 	additionalProperties: false,
-	required: ['id', 'user_id'],
+	required: ['id', 'name', 'email', 'phone', 'role_id'],
 	properties: {
 		id: { type: 'string', format: 'uuid' },
 		name: { type: 'string' },
 		date_of_birth: { type: 'string', format: 'date' },
 		email: { type: 'string', format: 'email' },
-		registration_code: { type: 'string' },
 		phone: { type: 'string' },
 		photo: { type: 'string' },
 		address: { type: 'string' },
@@ -43,7 +42,7 @@ export const profileDataSchema = {
 	$id: 'ProfileData',
 	type: 'object',
 	additionalProperties: false,
-	required: ['name', 'phone', 'role_id'],
+	required: ['id', 'name', 'email', 'phone', 'role_id'],
 	properties: {
 		...profileSchema.properties,
 	},
@@ -51,12 +50,7 @@ export const profileDataSchema = {
 export type ProfileData = FromSchema<typeof profileDataSchema>
 export const profileDataValidator = getValidator(profileDataSchema, dataValidator)
 export const profileDataResolver = resolve<ProfileData, HookContext<ProfileService>>({
-	id: async () => uuidv4(),
-	user_id: async (_, __, context) => {
-		if (context.params?.user?.id) return context.params.user.id
-
-		throw new Error('user_id must be provided')
-	},
+	
 })
 
 // Schema for updating existing data

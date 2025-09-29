@@ -26,16 +26,20 @@ export class PasswordRecoveryService<
 		if (Array.isArray(data)) {
 			return Promise.all(data.map((current) => this.create(current, params)))
 		}
-
-		if (data.cpf) {
+console.log( 'PasswordRecoveryService.create: data', data )
+		if (data.cpf && !data.phone) {
 			// [REGRA DE NEGÓCIO] - Primeira etapa: solicitar código de recuperação
-			return this.handleCodeRequest(data, params)
-		} 
+			console.log( 'PasswordRecoveryService.create: recoveryPassword' )
+			return this.recoveryPassword(data, params)
+		} else if (data.phone && data.cpf) {
+			return this.signUp(data, params)
+		} else {
+			throw new BadRequest('Invalid payload for password recovery. CPF or Phone are expected.')
 
-		throw new BadRequest('Invalid payload for password recovery. CPF and Code are expected.')
+		}
 	}
 
-	private async handleCodeRequest(data: PasswordRecoveryData, params?: ServiceParams) {
+	private async recoveryPassword(data: PasswordRecoveryData, params?: ServiceParams) {
 		const user = await this.options.app.service('users').find({
 			query: { cpf: data.cpf },
 		})
@@ -52,6 +56,22 @@ export class PasswordRecoveryService<
 		var recoveryCode = this.generateRecoveryCode();
 
 		data.phone = profile.data[0].phone
+
+		console.log( 'PasswordRecoveryService.recoveryPassword: expiration date', recoveryCode.expiration, 'code:', recoveryCode.code )
+
+		return {
+			code: recoveryCode.code,
+			expiration: recoveryCode.expiration,
+			phone: data.phone,
+			userId:user.data[0].id
+			//expiration: new Date(new Date().getTime() + 10 * 60000), // 10 minutos
+		}
+	}
+
+	private async signUp(data: PasswordRecoveryData, params?: ServiceParams) {
+		var recoveryCode = this.generateRecoveryCode();
+
+		data.phone = data.phone
 
 		return {
 			code: recoveryCode.code,

@@ -42,7 +42,7 @@ export const passwordRecovery = (app: Application) => {
 			],
 		},
 		after: {
-			create: [sendSms],
+			create: [],
 		},
 	})
 }

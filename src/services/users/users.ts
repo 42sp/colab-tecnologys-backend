@@ -1,5 +1,6 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
 import { authenticate } from '@feathersjs/authentication'
+import { byPassAuth } from '../../hooks/authenticate'
 
 import { hooks as schemaHooks } from '@feathersjs/schema'
 
@@ -17,6 +18,10 @@ import {
 import type { Application } from '../../declarations'
 import { UsersService, getOptions } from './users.class'
 import { usersPath, usersMethods } from './users.shared'
+import { saveProfile } from '../../hooks/save-profile'
+import { getLoginToken } from '../../hooks/get-login-token'
+import { removeProps } from '../../hooks/remove-props'
+import { saveProfileId } from '../profile/profile.hooks'
 
 export * from './users.class'
 export * from './users.schema'
@@ -41,7 +46,7 @@ export const users = (app: Application) => {
 			get: [authenticate('jwt')],
 			create: [],
 			update: [authenticate('jwt')],
-			patch: [authenticate('jwt')],
+			patch: [],
 			remove: [authenticate('jwt')],
 		},
 		before: {
@@ -51,7 +56,7 @@ export const users = (app: Application) => {
 			],
 			find: [],
 			get: [],
-			create: [
+			create: [removeProps,
 				schemaHooks.validateData(usersDataValidator),
 				schemaHooks.resolveData(usersDataResolver),
 			],
@@ -63,12 +68,9 @@ export const users = (app: Application) => {
 		},
 		after: {
 			all: [],
-			// get: [
-			// 	async (context) => {
-			// 		context.result = {...context.result, profile: ""}
-			// 		return context
-			// 	}
-			// ]
+			create: [
+				saveProfile, saveProfileId, getLoginToken
+			],
 		},
 		error: {
 			all: [],
