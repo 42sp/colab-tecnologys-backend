@@ -22,6 +22,7 @@ import { saveProfile } from '../../hooks/save-profile'
 import { getLoginToken } from '../../hooks/get-login-token'
 import { removeProps } from '../../hooks/remove-props'
 import { saveProfileId } from '../profile/profile.hooks'
+import { resetPassword } from '../../hooks/reset-password'
 
 export * from './users.class'
 export * from './users.schema'
@@ -46,7 +47,7 @@ export const users = (app: Application) => {
 			get: [authenticate('jwt')],
 			create: [],
 			update: [authenticate('jwt')],
-			patch: [],
+			patch: [authenticate('jwt')],
 			remove: [authenticate('jwt')],
 		},
 		before: {
@@ -56,11 +57,13 @@ export const users = (app: Application) => {
 			],
 			find: [],
 			get: [],
-			create: [removeProps,
+			create: [
+				removeProps,
 				schemaHooks.validateData(usersDataValidator),
 				schemaHooks.resolveData(usersDataResolver),
 			],
 			patch: [
+				resetPassword,
 				schemaHooks.validateData(usersPatchValidator),
 				schemaHooks.resolveData(usersPatchResolver),
 			],
@@ -68,9 +71,7 @@ export const users = (app: Application) => {
 		},
 		after: {
 			all: [],
-			create: [
-				saveProfile, saveProfileId, getLoginToken
-			],
+			create: [saveProfile, saveProfileId, getLoginToken],
 		},
 		error: {
 			all: [],
