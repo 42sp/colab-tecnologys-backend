@@ -13,7 +13,7 @@ export const profileSchema = {
 	$id: 'Profile',
 	type: 'object',
 	additionalProperties: false,
-	required: ['id', 'name', 'email', 'phone', 'role_id'],
+	required: ['id', 'name', 'phone', 'role_id'],
 	properties: {
 		id: { type: 'string', format: 'uuid' },
 		name: { type: 'string' },
@@ -42,16 +42,14 @@ export const profileDataSchema = {
 	$id: 'ProfileData',
 	type: 'object',
 	additionalProperties: false,
-	required: ['id', 'name', 'email', 'phone', 'role_id'],
+	required: ['id', 'name', 'phone', 'role_id'],
 	properties: {
 		...profileSchema.properties,
 	},
 } as const
 export type ProfileData = FromSchema<typeof profileDataSchema>
 export const profileDataValidator = getValidator(profileDataSchema, dataValidator)
-export const profileDataResolver = resolve<ProfileData, HookContext<ProfileService>>({
-	
-})
+export const profileDataResolver = resolve<ProfileData, HookContext<ProfileService>>({})
 
 // Schema for updating existing data
 export const profilePatchSchema = {
