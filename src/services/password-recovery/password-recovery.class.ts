@@ -26,7 +26,7 @@ export class PasswordRecoveryService<
 		if (Array.isArray(data)) {
 			return Promise.all(data.map((current) => this.create(current, params)))
 		}
-console.log( 'PasswordRecoveryService.create: data', data )
+		console.log( 'PasswordRecoveryService.create: data', data )
 		if (data.cpf && !data.phone) {
 			// [REGRA DE NEGÓCIO] - Primeira etapa: solicitar código de recuperação
 			console.log( 'PasswordRecoveryService.create: recoveryPassword' )

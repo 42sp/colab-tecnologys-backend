@@ -17,6 +17,8 @@ import {
 import type { Application } from '../../declarations'
 import { TasksService, getOptions } from './tasks.class'
 import { tasksPath, tasksMethods } from './tasks.shared'
+import { retrieveTask } from '../../hooks/retrieve-task'
+import { filterRole } from '../../hooks/filter-role'
 
 export * from './tasks.class'
 export * from './tasks.schema'
@@ -44,7 +46,7 @@ export const tasks = (app: Application) => {
 				schemaHooks.validateQuery(tasksQueryValidator),
 				schemaHooks.resolveQuery(tasksQueryResolver),
 			],
-			find: [],
+			find: [filterRole],
 			get: [],
 			create: [
 				schemaHooks.validateData(tasksDataValidator),
@@ -57,7 +59,7 @@ export const tasks = (app: Application) => {
 			remove: [],
 		},
 		after: {
-			all: [],
+			all: [retrieveTask],
 		},
 		error: {
 			all: [],

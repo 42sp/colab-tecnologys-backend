@@ -1,7 +1,6 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
-import { resolve, getValidator, querySyntax } from '@feathersjs/schema'
+import { resolve, getValidator } from '@feathersjs/schema'
 import type { FromSchema } from '@feathersjs/schema'
-
 import type { HookContext } from '../../declarations'
 import { dataValidator } from '../../validators'
 import type { PasswordRecoveryService } from './password-recovery.class'
