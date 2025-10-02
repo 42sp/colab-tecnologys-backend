@@ -31,6 +31,7 @@ export const getProfile = async (context: HookContext) => {
 
     const roles = await app.service('roles').get(profile.data[0].role_id)
 
+
     //const unwrap = (res: any) => (Array.isArray(res) ? res : res?.data ?? []);
     const userData = {...profile.data[0], profileId:user}
    
