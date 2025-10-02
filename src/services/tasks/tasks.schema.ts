@@ -84,7 +84,7 @@ export const tasksPatchSchema = {
 export type TasksPatch = FromSchema<typeof tasksPatchSchema>
 export const tasksPatchValidator = getValidator(tasksPatchSchema, dataValidator)
 export const tasksPatchResolver = resolve<TasksPatch, HookContext<TasksService>>({
-	updated_at: async () => `${new Date(new Date().getTime()).toLocaleString("sv-SE", { timeZone: "America/Sao_Paulo" }).replace(" ", "T") + "." + String(new Date().getMilliseconds()).padStart(3,"0")}`,
+	updated_at: async () => new Date().toISOString(),
 })
 
 // Schema for allowed query properties
