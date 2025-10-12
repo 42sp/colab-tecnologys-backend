@@ -5,9 +5,9 @@ import type { HookContext } from '../declarations'
 
 export const retrieveTask = async (context: HookContext) => {
   console.log(`Running hook retrieve-task on ${context.path}.${context.method}`)
-  console.log('data', context.result, context.data, context.params)
+  // console.log('data', context.result, context.data, context.params)
 
-  
+
 
   const { result, app } = context;
   const data = Array.isArray(result.data) ? result.data : Array.isArray(result) ? result : [result];
@@ -82,10 +82,10 @@ export const retrieveTask = async (context: HookContext) => {
     }
   }
 
-  console.log('data after join', data);
+  // console.log('data after join', data);
 
-  //const keysToKeep = ['stage', 'floor', 'apartment', 'tower', 'task_percentage', 'worker_id', 'status', 'completion_date', 'service_id', 'id', 'worker_name', 'construction_name']; 
-  const keysToRemove = ['service_type_id', 'work_id', 'construction_address', 'updated_at', 'created_at', 'worker_id', 'service_id']; 
+  //const keysToKeep = ['stage', 'floor', 'apartment', 'tower', 'task_percentage', 'worker_id', 'status', 'completion_date', 'service_id', 'id', 'worker_name', 'construction_name'];
+  const keysToRemove = ['service_type_id', 'work_id', 'construction_address', 'updated_at', 'created_at', 'worker_id', 'service_id'];
 
   const objects = data.map((data: any) => {
     return Object.fromEntries(
