@@ -27,6 +27,7 @@ export const constructionsSchema = {
 		is_active: { type: 'boolean', default: true },
 		created_at: { type: 'string', format: 'date-time' },
 		updated_at: { type: 'string', format: 'date-time' },
+		status: { type: 'string'}
 	},
 } as const
 export type Constructions = FromSchema<typeof constructionsSchema>
@@ -76,13 +77,14 @@ export const constructionsPatchResolver = resolve<
 
 // Schema for allowed query properties
 export const constructionsQuerySchema = {
-	$id: 'ConstructionsQuery',
-	type: 'object',
-	additionalProperties: false,
-	properties: {
-		...querySyntax(constructionsSchema.properties),
-	},
-} as const
+  $id: 'ConstructionsQuery',
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    ...querySyntax(constructionsSchema.properties),
+  },
+} as const;
+
 export type ConstructionsQuery = FromSchema<typeof constructionsQuerySchema>
 export const constructionsQueryValidator = getValidator(constructionsQuerySchema, queryValidator)
 export const constructionsQueryResolver = resolve<
