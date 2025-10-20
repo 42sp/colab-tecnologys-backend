@@ -13,7 +13,7 @@ export const profileSchema = {
 	$id: 'Profile',
 	type: 'object',
 	additionalProperties: false,
-	required: ['id', 'name', 'phone', 'role_id'],
+	required: ['name', 'phone', 'role_id', 'email'],
 	properties: {
 		id: { type: 'string', format: 'uuid' },
 		name: { type: 'string' },
@@ -42,7 +42,7 @@ export const profileDataSchema = {
 	$id: 'ProfileData',
 	type: 'object',
 	additionalProperties: false,
-	required: ['id', 'name', 'phone', 'role_id'],
+	required: ['name', 'phone', 'role_id', 'email'],
 	properties: {
 		...profileSchema.properties,
 	},

@@ -27,7 +27,7 @@ export const constructionsSchema = {
 		is_active: { type: 'boolean', default: true },
 		created_at: { type: 'string', format: 'date-time' },
 		updated_at: { type: 'string', format: 'date-time' },
-		status: { type: 'string'}
+		finished_at: { type: 'string', format: 'date-time' }
 	},
 } as const
 export type Constructions = FromSchema<typeof constructionsSchema>
@@ -82,6 +82,7 @@ export const constructionsQuerySchema = {
   additionalProperties: false,
   properties: {
     ...querySyntax(constructionsSchema.properties),
+	status: { type: 'string' },
   },
 } as const;
 

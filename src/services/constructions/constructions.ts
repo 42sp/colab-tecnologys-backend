@@ -1,6 +1,6 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
 import { authenticate } from '@feathersjs/authentication'
-import { applyLike } from '../../hooks/apply-like';
+import { applyFiltersAndLike } from '../../hooks/applyFiltersAndLike';
 import { hooks as schemaHooks } from '@feathersjs/schema'
 
 import {
@@ -44,7 +44,7 @@ export const constructions = (app: Application) => {
 				schemaHooks.validateQuery(constructionsQueryValidator),
 				schemaHooks.resolveQuery(constructionsQueryResolver),
 			],
-			find: [applyLike()],
+			find: [applyFiltersAndLike()],
 			get: [],
 			create: [
 				schemaHooks.validateData(constructionsDataValidator),

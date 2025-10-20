@@ -7,6 +7,7 @@ import { roles } from './roles/roles'
 import { uploads } from './uploads/uploads'
 import { profile } from './profile/profile'
 import { users } from './users/users'
+import { employees } from './employee/employees.service'
 // For more information about this file see https://dove.feathersjs.com/guides/cli/application.html#configure-functions
 import type { Application } from '../declarations'
 import { tasksServices } from './tasks/services/tasks_services'
@@ -22,5 +23,6 @@ export const services = (app: Application) => {
 	app.configure(profile)
 	app.configure(users)
 	app.configure(tasksServices)
+	app.configure(employees)
 	// All services will be registered here
 }
