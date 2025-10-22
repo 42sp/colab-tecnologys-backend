@@ -3,6 +3,10 @@ import { Forbidden } from '@feathersjs/errors'
 import bcrypt from 'bcryptjs'
 
 export async function resetPassword(context: HookContext) {
+	if (!context.params.provider) {
+        return context; 
+    }
+
 	console.log(`Running hook reset-password on ${context.path}.${context.method}`)
 
 	const { newPassword, oldPassword } = context.data || {}

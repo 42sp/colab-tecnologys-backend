@@ -6,9 +6,18 @@ import { Users } from './client'
 
 export type { NextFunction }
 
+interface Logger {
+    info: (...args: any[]) => void;
+    warn: (...args: any[]) => void;
+    error: (...args: any[]) => void;
+    debug: (...args: any[]) => void;
+}
+
 // The types for app.get(name) and app.set(name)
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface Configuration extends ApplicationConfiguration {}
+export interface Configuration extends ApplicationConfiguration {
+	logger: Logger;
+}
 
 // A mapping of service names to types. Will be extended in service files.
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -27,4 +36,5 @@ declare module '@feathersjs/feathers' {
 	interface Params {
 		user?: Users
 	}
+	
 }

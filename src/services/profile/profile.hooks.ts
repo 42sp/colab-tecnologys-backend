@@ -10,18 +10,39 @@ export const processProfileFindQuery = async (context: HookContext) => {
     const query = context.params.query;
 
     if (query) {
-        // --- 1. FILTRO DE PESQUISA POR NOME ($like) ---
         if (query.name) {
-            // Usa $ilike para pesquisa insensível a maiúsculas/minúsculas no PostgreSQL
-            // A string '%Termo%' já está vindo do frontend, então apenas a envolvemos no operador.
             query.name = { $ilike: query.name };
         }
 
-        // --- 2. FILTRO POR CARGO (role_id) ---
-        // Se query.role_id for fornecido, a busca por igualdade (role_id: 'UUID')
-        // deve funcionar por padrão no Feathers/Knex, mas mantemos o código
-        // para garantir que ele esteja sendo passado. Não é necessário $eq, pois é o padrão.
-        // if (query.role_id) { ... }
+    }
+
+    return context;
+};
+
+export const composeUserProfile = async (context: HookContext) => {
+    if (!context.result || !context.result.id) {
+        return context;
+    }
+
+    const profile = context.result;
+
+    try {
+        const userData = await context.app.service('users').get(profile.user_id, {
+            query: { $select: ['id', 'cpf', 'is_active', 'is_available', 'profile_id'] }
+        });
+
+		//console.log("DADOS DO USUÁRIO ENCONTRADOS:", userData);
+
+        context.result = {
+            ...profile,
+            ...userData,
+            id: profile.id
+        };
+
+		//console.log("DADOS APOS JUNTAR:", context.result);
+
+    } catch (error) {
+        console.error("Erro ao compor User/Profile:", error);
     }
 
     return context;

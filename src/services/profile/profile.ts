@@ -1,7 +1,7 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
 import { authenticate } from '@feathersjs/authentication'
 import { hooks as schemaHooks } from '@feathersjs/schema'
-import { processProfileFindQuery } from './profile.hooks'
+import { processProfileFindQuery, composeUserProfile } from './profile.hooks'
 
 
 import {
@@ -80,6 +80,9 @@ export const profile = (app: Application) => {
 		after: {
 			all: [],
 			create: [saveProfileId],
+			get: [
+				composeUserProfile
+			]
 		},
 		error: {
 			all: [],

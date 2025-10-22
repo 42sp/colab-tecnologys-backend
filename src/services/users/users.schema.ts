@@ -103,9 +103,20 @@ export type UsersQuery = FromSchema<typeof usersQuerySchema>
 export const usersQueryValidator = getValidator(usersQuerySchema, queryValidator)
 export const usersQueryResolver = resolve<UsersQuery, HookContext<UsersService>>({
 	id: async (value, _, context) => {
-		if (context.params.user) {
+		if (!context.params.provider) {
+			return value
+		}
+
+		if (context.params.user && context.method !== 'find') {
+			return value; 
+		}
+
+		if (context.params.user && !value) {
+			// Se o usuário logado está presente e nenhum ID foi explicitamente consultado, use o dele.
 			return context.params.user.id
 		}
+
+		
 		return value
 	},
 })

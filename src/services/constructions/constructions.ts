@@ -13,6 +13,7 @@ import {
 	constructionsPatchResolver,
 	constructionsQueryResolver,
 } from './constructions.schema'
+import { setNow } from 'feathers-hooks-common';
 
 import type { Application } from '../../declarations'
 import { ConstructionsService, getOptions } from './constructions.class'
@@ -53,6 +54,7 @@ export const constructions = (app: Application) => {
 			patch: [
 				schemaHooks.validateData(constructionsPatchValidator),
 				schemaHooks.resolveData(constructionsPatchResolver),
+				setNow('updated_at'),
 			],
 			remove: [],
 		},
