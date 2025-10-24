@@ -57,6 +57,7 @@ export type { Profile, ProfileData, ProfileQuery, ProfilePatch } from './service
 import { usersClient } from './services/users/users.shared'
 export type { Users, UsersData, UsersQuery, UsersPatch } from './services/users/users.shared'
 
+
 export interface Configuration {
   connection: TransportConnection<ServiceTypes>
 }

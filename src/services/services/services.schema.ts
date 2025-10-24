@@ -12,14 +12,9 @@ import { v4 as uuidv4 } from 'uuid'
 export const servicesSchema = {
 	$id: 'Services',
 	type: 'object',
-	additionalProperties: false,
+	additionalProperties: true,
 	required: [
-		'id',
 		'work_id',
-		'service_type_id',
-		'measurement_unit',
-		'unit_of_measure',
-		'material_unit',
 	],
 	properties: {
 		id: { type: 'string', format: 'uuid' },
@@ -35,7 +30,7 @@ export const servicesSchema = {
 		thickness: { type: 'number' },
 		labor_quantity: { type: 'number' },
 		material_quantity: { type: 'number' },
-		worker_quantity: { type: 'integer' },
+		worker_quantity: { type: 'number' },
 		bonus: { type: 'number', default: 1 },
 		unit_of_measure: { type: 'string', maxLength: 20 },
 		material_unit: { type: 'string', maxLength: 20 },
@@ -57,8 +52,8 @@ export const servicesExternalResolver = resolve<Services, HookContext<ServicesSe
 export const servicesDataSchema = {
 	$id: 'ServicesData',
 	type: 'object',
-	additionalProperties: false,
-	required: ['service_type_id', 'work_id', 'acronym'],
+	additionalProperties: true,
+	required: ['work_id',],
 	properties: {
 		...servicesSchema.properties,
 	},
@@ -73,7 +68,7 @@ export const servicesDataResolver = resolve<ServicesData, HookContext<ServicesSe
 export const servicesPatchSchema = {
 	$id: 'ServicesPatch',
 	type: 'object',
-	additionalProperties: false,
+	additionalProperties: true,
 	required: [],
 	properties: {
 		...servicesSchema.properties,
@@ -89,7 +84,7 @@ export const servicesPatchResolver = resolve<ServicesPatch, HookContext<Services
 export const servicesQuerySchema = {
 	$id: 'ServicesQuery',
 	type: 'object',
-	additionalProperties: false,
+	additionalProperties: true,
 	properties: {
 		...querySyntax(servicesSchema.properties),
 	},

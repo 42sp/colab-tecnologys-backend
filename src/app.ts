@@ -30,6 +30,7 @@ const app: Application = express(feathers())
 app.configure(configuration(configurationValidator))
 app.use(cors())
 
+app.set('logger', logger)
 app.use(json({ limit: '500kb' }))
 app.use(urlencoded({ extended: true, limit: '500kb' }))
 // Host the public folder
