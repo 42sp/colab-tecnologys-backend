@@ -45,6 +45,38 @@ export type { Services, ServicesData, ServicesPatch, ServicesQuery }
 
 export interface ServicesParams extends KnexAdapterParams<ServicesQuery> {}
 
+/**
+ * Extrai o número do pavimento e a abreviação "PAV" do texto de pavimento.
+ * Ex: "26º PAVIMENTO - TORRE A" -> "26º PAV"
+ * Ex: "MEZANINO" -> "MEZANINO" (se for diferente do padrão)
+ * @param rawFloor O valor de pavimento vindo do CSV (ex: "26º PAVIMENTO - TORRE A").
+ * @returns O valor formatado (ex: "26º PAV").
+ */
+function formatFloor(rawFloor: string): string {
+    if (!rawFloor) {
+        return '';
+    }
+
+    // A Regex busca:
+    // 1. (^.*?) : Qualquer caractere no início (não ganancioso)
+    // 2. (PAV) : A string "PAV"
+    // 3. (?:IMENTO)? : Opcionalmente, a string "IMENTO" (para completar "PAVIMENTO")
+    // 4. (.*) : O restante da string até o final.
+    const regex = /^(.*PAV(?:IMENTO)?).*$/i;
+    const match = rawFloor.trim().match(regex);
+
+    if (match) {
+        // match[1] contém a parte que queremos manter (ex: "26º PAVIMENTO")
+        // Substituímos "PAVIMENTO" por "PAV" para padronizar.
+        return match[1]
+            .replace(/PAVIMENTO/i, 'PAV')
+            .trim();
+    }
+
+    // Retorna o valor original se não encontrar o padrão (ex: "MEZANINO")
+    return rawFloor.trim();
+}
+
 export class ServicesService<ServiceParams extends Params = ServicesParams> extends KnexService<
     Services,
     ServicesData,
@@ -65,6 +97,8 @@ export class ServicesService<ServiceParams extends Params = ServicesParams> exte
         return super.create(data as any, params);
     }
 
+    
+
     async _processImportBulk(data: CsvServiceData[]): Promise<ImportBulkResult> {
 
         const logger = this.app.get('logger')
@@ -81,6 +115,8 @@ export class ServicesService<ServiceParams extends Params = ServicesParams> exte
             const rawMarking = item.marking_m
             const rawFixation = item.fixation_m
             const rawElevation = item.elevation_m2
+
+            const formattedFloor = formatFloor(item.floor);
 
             // Criação do array de medições com os valores do item atual
             const measurements: { prefix: string; description: string; value: number }[] = [
@@ -117,7 +153,7 @@ export class ServicesService<ServiceParams extends Params = ServicesParams> exte
                         work_id: item.work_id,
                         service_type_id: 'e9f32070-1199-4bbf-8dbc-4d006b8aae6c',
                         tower: item.tower,
-                        floor: item.floor,
+                        floor: formattedFloor,
                         apartment: item.apartment,
                         measurement_unit: item.measurement_unit,
                         thickness: item.thickness,

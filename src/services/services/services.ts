@@ -23,13 +23,10 @@ export * from './services.class'
 export * from './services.schema'
 
 export const services = (app: Application) => {
-	
 	app.use(servicesPath, new ServicesService(getOptions(app), app), {
-		methods: servicesMethods, 
+		methods: servicesMethods,
 		events: [],
 	})
-
-
 
 	// Initialize hooks
 	app.service(servicesPath).hooks({
@@ -45,22 +42,37 @@ export const services = (app: Application) => {
 				//schemaHooks.validateQuery(servicesQueryValidator),
 				//schemaHooks.resolveQuery(servicesQueryResolver),
 			],
-			find: [],
+			find: [
+				async (context) => {
+					console.log('[BACKEND/FIND] Query recebida:', context.params.query);
+                    console.log('[BACKEND/FIND] work_id recebido:', context.params.query?.work_id);
+
+					const workId = context.params.query?.work_id
+
+					if (!workId) {
+						throw new Error('O work_id da construção deve ser fornecido para listar os serviços.')
+					}
+
+					return context
+				},
+			],
 			get: [],
 			create: [
 				//schemaHooks.validateData(servicesDataValidator),
 				//schemaHooks.resolveData(servicesDataResolver),
 				async (context) => {
-                    const isBulkImport = Array.isArray(context.data) && context.data.some(d => d.work_id && d.service_code)
+					const isBulkImport =
+						Array.isArray(context.data) && context.data.some((d) => d.work_id && d.service_code)
 
-                    if (isBulkImport) {
-                        const serviceInstance = context.service as ServicesService<any>
-                        const result = await serviceInstance._processImportBulk(context.data as unknown as CsvServiceData[])
-                        
+					if (isBulkImport) {
+						const serviceInstance = context.service as ServicesService<any>
+						const result = await serviceInstance._processImportBulk(
+							context.data as unknown as CsvServiceData[],
+						)
 
-                        context.result = result as any
-                    }
-                },
+						context.result = result as any
+					}
+				},
 			],
 			patch: [
 				schemaHooks.validateData(servicesPatchValidator),
