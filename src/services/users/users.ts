@@ -75,9 +75,9 @@ export const users = (app: Application) => {
         after: {
             all: [],
             create: [ 
-                //saveProfile,
-                //saveProfileId, 
-                //getLoginToken
+                saveProfile,
+                saveProfileId, 
+                getLoginToken
             ],
         },
         error: {
