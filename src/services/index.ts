@@ -1,3 +1,4 @@
+import { tasksReport } from './tasks/report/report'
 import { employee } from './employee/employee'
 import { constructions } from './constructions/constructions'
 import { tasks } from './tasks/tasks'
@@ -13,6 +14,7 @@ import type { Application } from '../declarations'
 import { tasksServices } from './tasks/services/tasks_services'
 
 export const services = (app: Application) => {
+  app.configure(tasksReport)
   app.configure(employee)
   app.configure(constructions)
   app.configure(tasks)
