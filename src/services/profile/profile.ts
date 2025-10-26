@@ -58,7 +58,7 @@ export const profile = (app: Application) => {
 				schemaHooks.resolveData(profileDataResolver),
 
 				// Duplicidade
-				async (context) => {
+				/*async (context) => {
 					const dataArray = Array.isArray(context.data) ? context.data : [context.data]
 					for (const data of dataArray) {
 						if (!data) continue
@@ -69,7 +69,7 @@ export const profile = (app: Application) => {
 						if (existing.length > 0) throw new BadRequest(`Funcionário ${data.name} já registrado`)
 					}
 					return context
-				},
+				},*/
 			],
 			patch: [
 				schemaHooks.validateData(profilePatchValidator),
