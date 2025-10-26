@@ -26,8 +26,9 @@ export class TasksReportService<
 > {
 	async find(params?: unknown): Promise<any> {
 		const result = {
-			Report: await this.calculateReport(),
-			Resume: await this.calculateResume()
+			produtivity: await this.calculateReport(),
+			resume: await this.calculateResume(),
+			progressByFloor: await this.calculateProgressByFloor()
 		};
 
 		return result;
@@ -80,6 +81,86 @@ export class TasksReportService<
 			totalCompletedActivities,
 			activitiesPerFloorCount
 		}
+	}
+
+	async calculateProgressByFloor(): Promise<any> {
+		const knex = this.Model;
+
+		function toPgTimestamp(date: Date | string | null): string {
+			if (!date) return '';
+			if (typeof date === 'string') {
+				return date.split('.')[0].replace('T', ' ').split(' GMT')[0];
+			}
+			return date.toISOString().replace('T', ' ').split('.')[0];
+		}
+
+		const [{ first_date }] = await knex('services').min('created_at as first_date');
+		const lastDateRows: { last_date: Date | string | null }[] = await knex('services').select(knex.raw('MAX(GREATEST(updated_at, created_at)) as last_date'));
+		const last_date = lastDateRows[0]?.last_date;
+
+		const firstDateStr = toPgTimestamp(first_date);
+		const lastDateStr = toPgTimestamp(last_date);
+
+		const result = await knex
+			.with('weeks', (qb) => {
+				qb.select(
+					knex.raw(`generate_series(0, FLOOR(EXTRACT(EPOCH FROM (TIMESTAMP '${lastDateStr}' - TIMESTAMP '${firstDateStr}')) / (7 * 24 * 60 * 60))) + 1 as week_number`)
+				);
+			})
+			.with('services_with_week', (qb) => {
+				qb.select(
+					'*',
+					knex.raw(`FLOOR(EXTRACT(EPOCH FROM (CASE WHEN is_done THEN updated_at ELSE created_at END - TIMESTAMP '${firstDateStr}')) / (7 * 24 * 60 * 60)) + 1 as week_number`)
+				).from('services');
+			})
+			.with('grouped', (qb) => {
+				qb.select(
+					'week_number',
+					'floor',
+					knex.raw('SUM(CASE WHEN is_done THEN 1 ELSE 0 END)::decimal as done_count'),
+					knex.raw('COUNT(*)::decimal as total_count')
+				)
+					.from('services_with_week')
+					.groupBy('week_number', 'floor');
+			})
+			.with('all_weeks_floors', (qb) => {
+				qb.select('weeks.week_number', 'f.floor')
+					.from('weeks')
+					.crossJoin(
+						knex.raw('(SELECT DISTINCT floor FROM services) as f')
+					);
+			})
+			.with('progress_by_week', (qb) => {
+				qb.select(
+					'all_weeks_floors.week_number',
+					'all_weeks_floors.floor',
+					knex.raw('COALESCE(grouped.done_count, 0) as done_count'),
+					knex.raw('COALESCE(grouped.total_count, 0) as total_count')
+				)
+					.from('all_weeks_floors')
+					.leftJoin('grouped', function () {
+						this.on('grouped.week_number', '=', 'all_weeks_floors.week_number')
+							.andOn('grouped.floor', '=', 'all_weeks_floors.floor');
+					});
+			})
+			.with('accumulated', (qb) => {
+				qb.select(
+					'week_number',
+					'floor',
+					knex.raw('SUM(done_count) OVER (PARTITION BY floor ORDER BY week_number) as acc_done'),
+					knex.raw('MAX(total_count) OVER (PARTITION BY floor) as total')
+				)
+					.from('progress_by_week');
+			})
+			.select(
+				knex.raw(`'Sem ' || week_number as semana`),
+				'floor',
+				knex.raw('ROUND(CASE WHEN total > 0 THEN acc_done / total ELSE 0 END, 2) as porcentagem_acumulada')
+			)
+			.from('accumulated')
+			.orderBy('week_number', 'floor');
+
+		return result;
 	}
 }
 
