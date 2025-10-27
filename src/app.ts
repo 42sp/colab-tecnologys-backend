@@ -21,6 +21,7 @@ import { postgresql } from './postgresql'
 import { services } from './services/index'
 import { channels } from './channels'
 import { authentication } from './authentication'
+import { setupSwagger } from './swagger'
 
 var serveIndex = require('serve-index')
 
@@ -53,6 +54,9 @@ app.set('authentication', configAuthentication)
 app.configure(authentication)
 app.configure(services)
 app.configure(channels)
+
+// Configure Swagger API Documentation
+setupSwagger(app)
 
 // Configure a middleware for 404s and the error handler
 app.use(notFound())

@@ -1,0 +1,1 @@
+- Esse backend serve duas aplicações, mobile e web. Ele fornece informações das obras e funcionarios. O Aplicativo mostra informações de andamento de serviços, funcionarios, produtividade, tarefas etc. Esse backend usa o framework feathersjs e eu gostaria que mantivesse essa organização e método funcional.
