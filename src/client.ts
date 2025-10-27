@@ -10,7 +10,7 @@ export type {
   TasksReportData,
   TasksReportQuery,
   TasksReportPatch
-} from './services/tasks/Report/Report.shared'
+} from './services/tasks/report/report.shared'
 
 import { employeeClient } from './services/employee/employee.shared'
 export type {
