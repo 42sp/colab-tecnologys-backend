@@ -3,7 +3,7 @@ import type { Paginated, Params } from '@feathersjs/feathers'
 import { KnexService } from '@feathersjs/knex'
 import type { KnexAdapterParams, KnexAdapterOptions } from '@feathersjs/knex'
 
-import type { Application } from '../../../declarations'
+import type { Application } from '../../declarations'
 import type {
   TasksReport,
   TasksReportData,

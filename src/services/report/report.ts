@@ -14,7 +14,7 @@ import {
   tasksReportQueryResolver
 } from './report.schema'
 
-import type { Application } from '../../../declarations'
+import type { Application } from '../../declarations'
 import { TasksReportService, getOptions } from './report.class'
 import { tasksReportPath, tasksReportMethods } from './report.shared'
 
@@ -66,7 +66,7 @@ export const tasksReport = (app: Application) => {
 }
 
 // Add this service to the service type index
-declare module '../../../declarations' {
+declare module '../../declarations' {
   interface ServiceTypes {
     [tasksReportPath]: TasksReportService
   }

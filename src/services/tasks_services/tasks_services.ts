@@ -14,11 +14,11 @@ import {
 	tasksServicesQueryResolver,
 } from './tasks_services.schema'
 
-import type { Application } from '../../../declarations'
+import type { Application } from '../../declarations'
 import { TasksServicesService, getOptions } from './tasks_services.class'
 import { tasksPath, tasksServicesMethods } from './tasks_services.shared'
-import { retrieveTask } from '../../../hooks/retrieve-task'
-import { filterRole } from '../../../hooks/filter-role'
+import { retrieveTask } from '../../hooks/retrieve-task'
+import { filterRole } from '../../hooks/filter-role'
 
 export * from './tasks_services.class'
 export * from './tasks_services.schema'
@@ -68,7 +68,7 @@ export const tasksServices = (app: Application) => {
 }
 
 // Add this service to the service type index
-declare module '../../../declarations' {
+declare module '../../declarations' {
 	interface ServiceTypes {
 		[tasksPath]: TasksServicesService
 	}
