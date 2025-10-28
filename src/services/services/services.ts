@@ -182,7 +182,7 @@ export const services = (app: Application) => {
 				//schemaHooks.resolveQuery(servicesQueryResolver),
 			],
 			find: [
-				async (context) => {
+				/*async (context) => {
 					console.log('[BACKEND/FIND] Query recebida:', context.params.query);
                     console.log('[BACKEND/FIND] work_id recebido:', context.params.query?.work_id);
 
@@ -193,7 +193,7 @@ export const services = (app: Application) => {
 					}
 
 					return context
-				},
+				},*/
 			],
 			get: [],
 			create: [

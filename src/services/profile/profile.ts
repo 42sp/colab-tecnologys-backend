@@ -48,7 +48,7 @@ export const profile = (app: Application) => {
 				schemaHooks.resolveQuery(profileQueryResolver),
 			],
 			find: [
-				processProfileFindQuery,
+				//processProfileFindQuery,
 			],
 			get: [],
 			create: [
@@ -81,7 +81,7 @@ export const profile = (app: Application) => {
 			all: [],
 			create: [saveProfileId],
 			get: [
-				composeUserProfile
+				//composeUserProfile
 			]
 		},
 		error: {
