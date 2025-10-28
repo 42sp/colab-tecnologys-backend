@@ -160,7 +160,7 @@ export class ServicesService<ServiceParams extends Params = ServicesParams> exte
                         stage: item.wall,
                         material_quantity: item.qty_material_m2,
                         worker_quantity: item.qty_model_m2,
-                        acronym: 'XX',
+                        acronym: measurement.prefix,
                         
                         // Campos transformados (IDs e valores)
                         service_id: newServiceId,             
