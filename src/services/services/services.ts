@@ -44,14 +44,57 @@ export const services = (app: Application) => {
 			],
 			find: [
 				async (context) => {
-					console.log('[BACKEND/FIND] Query recebida:', context.params.query);
-                    console.log('[BACKEND/FIND] work_id recebido:', context.params.query?.work_id);
-
-					const workId = context.params.query?.work_id
+					console.log('[BACKEND/FIND] Query recebida:', context.params.query)
+					const query = context.params.query || {}
+					const workId = query.work_id
 
 					if (!workId) {
 						throw new Error('O work_id da construção deve ser fornecido para listar os serviços.')
 					}
+					console.log('[BACKEND/FIND] work_id recebido:', context.params.query?.work_id)
+
+					const towerFilter = query.tower
+					const floorFilter = query.floor
+					const acronymFilter = query.acronym
+					const quickSearch = query.$search
+
+					if (towerFilter && towerFilter !== 'all') {
+						query.tower = towerFilter
+						console.log(`[BACKEND/FIND] Aplicando filtro de Torre: ${towerFilter}`)
+					} else {
+						delete query.tower
+					}
+
+					if (floorFilter && floorFilter !== 'all') {
+						query.floor = floorFilter
+						console.log(`[BACKEND/FIND] Aplicando filtro de Pavimento: ${floorFilter}`)
+					} else {
+						delete query.floor
+					}
+
+					if (acronymFilter && acronymFilter !== 'all') {
+						query.acronym = acronymFilter
+						console.log(`[BACKEND/FIND] Aplicando filtro de Classificação: ${acronymFilter}`)
+					} else {
+						delete query.acronym
+					}
+
+					if (quickSearch && typeof quickSearch === 'string') {
+						const likeSearch = { $like: `%${quickSearch}%` }
+						delete query.$search 
+						query.$or = [
+							{ service_id: likeSearch },
+							{ tower: likeSearch },
+							{ floor: likeSearch },
+							{ apartment: likeSearch }, 
+							{ measurement_unit: likeSearch},
+							{ stage: likeSearch },
+						]
+						console.log(`[BACKEND/FIND] Aplicando Busca Rápida: ${quickSearch}`)
+					}
+
+					context.params.query = query
+					console.log('[BACKEND/FIND] Query Final:', context.params.query)
 
 					return context
 				},
