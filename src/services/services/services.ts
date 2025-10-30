@@ -182,18 +182,18 @@ export const services = (app: Application) => {
 				//schemaHooks.resolveQuery(servicesQueryResolver),
 			],
 			find: [
-				async (context) => {
-					console.log('[BACKEND/FIND] Query recebida:', context.params.query);
-                    console.log('[BACKEND/FIND] work_id recebido:', context.params.query?.work_id);
+				// async (context) => {
+				// 	console.log('[BACKEND/FIND] Query recebida:', context.params.query);
+        //             console.log('[BACKEND/FIND] work_id recebido:', context.params.query?.work_id);
 
-					const workId = context.params.query?.work_id
+				// 	const workId = context.params.query?.work_id
 
-					if (!workId) {
-						throw new Error('O work_id da construção deve ser fornecido para listar os serviços.')
-					}
+				// 	if (!workId) {
+				// 		throw new Error('O work_id da construção deve ser fornecido para listar os serviços.')
+				// 	}
 
-					return context
-				},
+				// 	return context
+				// },
 			],
 			get: [],
 			create: [
