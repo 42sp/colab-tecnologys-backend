@@ -67,7 +67,9 @@ export const tasksReportQuerySchema = {
   type: 'object',
   additionalProperties: false,
   properties: {
-    ...querySyntax(tasksReportSchema.properties)
+    ...querySyntax(tasksReportSchema.properties),
+    period: { type: 'string', enum: ['day', 'week', 'month'] },
+    worker_id: { type: 'string' }
   }
 } as const
 export type TasksReportQuery = FromSchema<typeof tasksReportQuerySchema>

@@ -61,7 +61,7 @@ export const authentication = (app: Application) => {
 
 	app.service('authentication').hooks({
 		after: {
-		create: [getProfile], 
+			create: [getProfile], 
 		},
   });
 }

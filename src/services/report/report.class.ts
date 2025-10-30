@@ -28,7 +28,8 @@ export class TasksReportService<
 		const result = {
 			produtivity: await this.calculateReport(),
 			resume: await this.calculateResume(),
-			progressByFloor: await this.calculateProgressByFloor()
+			progressByFloor: await this.calculateProgressByFloor(),
+			productivityByUser: await this.calculateProductivityByUser((params as any).query),
 		};
 
 		return result;
@@ -162,7 +163,140 @@ export class TasksReportService<
 
 		return result;
 	}
+
+	async calculateProductivityByUser(params: { period: 'day' | 'week' | 'month', worker_id?: string }) {
+		const knex = this.Model;
+
+		let periodSelect: string;
+		switch (params.period) {
+			case 'day':
+				periodSelect = `DATE(completion_date)`;
+				break;
+			case 'week':
+				periodSelect = `DATE_TRUNC('week', completion_date)`;
+				break;
+			case 'month':
+				periodSelect = `DATE_TRUNC('month', completion_date)`;
+				break;
+			default:
+				throw new Error('Invalid period');
+		}
+
+		type Row = {
+			worker_id: string;
+			worker_name: string;
+			service_floor: string;
+			period: string | Date;
+			completed_tasks: string | number;
+		};
+		let query = knex('tasks')
+			.select(
+				'worker_id',
+				'worker_name',
+				'service_floor',
+				knex.raw(`${periodSelect} as period`),
+				knex.raw('COUNT(*) as completed_tasks')
+			)
+			.whereIn('status', ['completed', 'approved'])
+			.whereNotNull('completion_date');
+
+		if (params.worker_id) {
+			query = query.where('worker_id', params.worker_id);
+		}
+
+		const rows: Row[] = await query
+			.groupBy('worker_id', 'worker_name', 'service_floor', knex.raw(periodSelect))
+			.orderBy('period', 'asc');
+
+		function getISOWeek(date: Date): string {
+			const tmp = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+			tmp.setUTCDate(tmp.getUTCDate() + 4 - (tmp.getUTCDay() || 7));
+			const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(), 0, 1));
+			const weekNo = Math.ceil((((tmp.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+			return `${tmp.getUTCFullYear()}-W${weekNo.toString().padStart(2, '0')}`;
+		}
+
+		const allPeriodsSet = new Set<string>();
+		const mesesAbrev = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+		rows.forEach((row) => {
+			let label: string;
+			if (params.period === 'week') {
+				const d = new Date(row.period as string);
+				const tmp = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+				tmp.setUTCDate(tmp.getUTCDate() + 4 - (tmp.getUTCDay() || 7));
+				const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(), 0, 1));
+				const weekNo = Math.ceil((((tmp.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+				label = `Sem ${weekNo}`;
+			} else if (params.period === 'day') {
+				const d = new Date(row.period as string);
+				label = String(d.getUTCDate());
+			} else if (params.period === 'month') {
+				const d = new Date(row.period as string);
+				label = mesesAbrev[d.getUTCMonth()];
+			} else {
+				label = row.period instanceof Date ? row.period.toISOString().slice(0, 10) : String(row.period).slice(0, 10);
+			}
+			allPeriodsSet.add(label);
+		});
+		let labels: string[];
+		if (params.period === 'day') {
+			labels = Array.from(allPeriodsSet).map(Number).sort((a, b) => a - b).map(String);
+		} else if (params.period === 'week') {
+			labels = Array.from(allPeriodsSet)
+				.map(l => ({ l, n: parseInt(l.replace(/\D/g, ''), 10) }))
+				.sort((a, b) => a.n - b.n)
+				.map(obj => obj.l);
+		} else {
+			labels = Array.from(allPeriodsSet).sort();
+		}
+
+		const userMap: Record<string, { worker_name: string, floor: string, data: Record<string, number> }> = {};
+		rows.forEach((row) => {
+			let label: string;
+			if (params.period === 'week') {
+				const d = new Date(row.period as string);
+				const tmp = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+				tmp.setUTCDate(tmp.getUTCDate() + 4 - (tmp.getUTCDay() || 7));
+				const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(), 0, 1));
+				const weekNo = Math.ceil((((tmp.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+				label = `Sem ${weekNo}`;
+			} else if (params.period === 'day') {
+				const d = new Date(row.period as string);
+				label = String(d.getUTCDate());
+			} else if (params.period === 'month') {
+				const d = new Date(row.period as string);
+				label = mesesAbrev[d.getUTCMonth()];
+			} else {
+				label = row.period instanceof Date ? row.period.toISOString().slice(0, 10) : String(row.period).slice(0, 10);
+			}
+			if (!userMap[row.worker_id]) {
+				userMap[row.worker_id] = {
+					worker_name: row.worker_name,
+					floor: row.service_floor || '',
+					data: {}
+				};
+			}
+			userMap[row.worker_id].data[label] = Number(row.completed_tasks);
+		});
+
+		const datasets = Object.entries(userMap).map(([worker_id, user]) => {
+			return {
+				data: labels.map(label => user.data[label] || 0),
+				label: user.worker_name || worker_id,
+				active: true,
+			};
+		});
+
+		const result = {
+			labels,
+			datasets
+		};
+
+		return result;
+	}
 }
+
+
 
 export const getOptions = (app: Application): KnexAdapterOptions => {
   return {
