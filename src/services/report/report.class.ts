@@ -26,7 +26,7 @@ export class TasksReportService<
 > {
 	async find(params?: unknown): Promise<any> {
 		const result = {
-			produtivity: await this.calculateReport(),
+			production: await this.calculateProduction((params as any).query),
 			resume: await this.calculateResume(),
 			progressByFloor: await this.calculateProgressByFloor(),
 			productivityByUser: await this.calculateProductivityByUser((params as any).query),
@@ -35,19 +35,36 @@ export class TasksReportService<
 		return result;
 	}
 
-	async calculateReport(): Promise<any> {
+	async calculateProduction(params: {
+		period: 'day' | 'week' | 'month',
+		worker_id?: string,
+		periodProduction?: 'week' | 'month'
+	}): Promise<any> {
 		const knex = this.Model
+
+		let dateFormat: string;
+		let groupByClause: string;
+
+		if (params.periodProduction === 'week') {
+			dateFormat = "TO_CHAR(DATE_TRUNC('week', t.completion_date), 'YYYY-MM-DD')";
+			groupByClause = "DATE_TRUNC('week', t.completion_date), s.floor";
+		} else {
+			dateFormat = "TO_CHAR(t.completion_date, 'YYYY-MM')";
+			groupByClause = "TO_CHAR(t.completion_date, 'YYYY-MM'), s.floor";
+		}
 
 		const result = await knex('tasks as t')
 			.select(
-				knex.raw("TO_CHAR(t.completion_date, 'YYYY-MM') as ano_mes"),
+				knex.raw(`${dateFormat} as periodo`),
 				's.floor',
 				knex.raw('SUM(worker_quantity) as total_worker_quantity')
 			)
 			.join('services as s', 't.service_id', 's.id')
 			.join('profiles as p', 'p.id', 't.worker_id')
-			.groupByRaw("TO_CHAR(t.completion_date, 'YYYY-MM'), s.floor")
-			.orderByRaw("TO_CHAR(t.completion_date, 'YYYY-MM'), s.floor")
+			.whereNotNull('t.completion_date')
+			.where('s.is_done', true)
+			.groupByRaw(groupByClause)
+			.orderByRaw(groupByClause)
 
 		return result
 	}
