@@ -46,14 +46,14 @@ export class TasksReportService<
 		let groupByClause: string;
 
 		if (params.periodProduction === 'week') {
-			dateFormat = "TO_CHAR(DATE_TRUNC('week', t.completion_date), 'YYYY-MM-DD')";
-			groupByClause = "DATE_TRUNC('week', t.completion_date), s.floor";
+			dateFormat = "TO_CHAR(t.completion_date, 'YYYY-MM-DD')";
+			groupByClause = "TO_CHAR(t.completion_date, 'YYYY-MM-DD'), s.floor";
 		} else {
 			dateFormat = "TO_CHAR(t.completion_date, 'YYYY-MM')";
 			groupByClause = "TO_CHAR(t.completion_date, 'YYYY-MM'), s.floor";
 		}
 
-		const result = await knex('tasks as t')
+		let query = knex('tasks as t')
 			.select(
 				knex.raw(`${dateFormat} as periodo`),
 				's.floor',
@@ -62,9 +62,16 @@ export class TasksReportService<
 			.join('services as s', 't.service_id', 's.id')
 			.join('profiles as p', 'p.id', 't.worker_id')
 			.whereNotNull('t.completion_date')
-			.where('s.is_done', true)
+			.where('s.is_done', true);
+
+		if (params.periodProduction === 'week') {
+			// Hoje e os últimos 6 dias (total de 7 dias)
+			query = query.whereRaw("DATE(t.completion_date) >= CURRENT_DATE - INTERVAL '6 days' AND DATE(t.completion_date) <= CURRENT_DATE");
+		}
+
+		const result = await query
 			.groupByRaw(groupByClause)
-			.orderByRaw(groupByClause)
+			.orderByRaw(groupByClause);
 
 		return result
 	}
