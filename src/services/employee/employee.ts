@@ -26,9 +26,7 @@ export * from './employee.schema'
 export const employee = (app: Application) => {
 
   app.use(employeePath, new EmployeeService(getOptions(app)), {
-
     methods: employeeMethods,
-
     events: []
   })
 

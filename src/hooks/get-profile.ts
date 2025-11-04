@@ -23,7 +23,7 @@ export const getProfile = async (context: HookContext) => {
     // Exemplos de dados extras vindos de outros services
     //const [profile] = await Promise.all([
      const profile = await app.service('profile').find({
-        query: { id: userId, $limit: 1, $select: ['name', 'email', 'photo', 'date_of_birth', 'phone', 'address', 'city', 'state', 'postcode', 'role_id'] }
+        query: { user_id: userId, $limit: 1, $select: ['name', 'email', 'photo', 'date_of_birth', 'phone', 'address', 'city', 'state', 'postcode', 'role_id'] }
       });
     //]);
 

@@ -39,7 +39,8 @@ export const roles = (app: Application) => {
 			],
 			find: [],
 			get: [],
-			create: [authenticate('jwt')],
+			create: [//authenticate('jwt')
+			],
 			update: [authenticate('jwt')],
 			patch: [authenticate('jwt')],
 			remove: [authenticate('jwt')],

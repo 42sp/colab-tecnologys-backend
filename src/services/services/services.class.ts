@@ -151,7 +151,11 @@ export class ServicesService<ServiceParams extends Params = ServicesParams> exte
                         id: uuidv4(),
                         // Campos de mapeamento direto/constantes
                         work_id: item.work_id,
-                        service_type_id: 'e9f32070-1199-4bbf-8dbc-4d006b8aae6c',
+                        // Versão p/ Supabase
+                        //service_type_id: 'e9f32070-1199-4bbf-8dbc-4d006b8aae6c',
+
+                        // Versão p/ Easypanel
+                        service_type_id: 'ed940120-14c2-4702-9de9-2a89d4d865fd',
                         tower: item.tower,
                         floor: formattedFloor,
                         apartment: item.apartment,

@@ -37,7 +37,7 @@ export const profile = (app: Application) => {
 	app.service(profilePath).hooks({
 		around: {
 			all: [
-				authenticate('jwt'),
+				//authenticate('jwt'),
 				schemaHooks.resolveExternal(profileExternalResolver),
 				schemaHooks.resolveResult(profileResolver),
 			],

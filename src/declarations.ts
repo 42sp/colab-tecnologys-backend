@@ -35,6 +35,7 @@ export type HookContext<S = any> = FeathersHookContext<Application, S>
 declare module '@feathersjs/feathers' {
 	interface Params {
 		user?: Users
+        searchTerm?: string
 	}
 	
 }
