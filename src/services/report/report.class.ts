@@ -26,7 +26,7 @@ export class TasksReportService<
 > {
 	async find(params?: unknown): Promise<any> {
 		const result = {
-			produtivity: await this.calculateReport(),
+			production: await this.calculateProduction((params as any).query),
 			resume: await this.calculateResume(),
 			progressByFloor: await this.calculateProgressByFloor(),
 			productivityByUser: await this.calculateProductivityByUser((params as any).query),
@@ -35,19 +35,43 @@ export class TasksReportService<
 		return result;
 	}
 
-	async calculateReport(): Promise<any> {
+	async calculateProduction(params: {
+		period: 'day' | 'week' | 'month',
+		worker_id?: string,
+		periodProduction?: 'week' | 'month'
+	}): Promise<any> {
 		const knex = this.Model
 
-		const result = await knex('tasks as t')
+		let dateFormat: string;
+		let groupByClause: string;
+
+		if (params.periodProduction === 'week') {
+			dateFormat = "TO_CHAR(t.completion_date, 'YYYY-MM-DD')";
+			groupByClause = "TO_CHAR(t.completion_date, 'YYYY-MM-DD'), s.floor";
+		} else {
+			dateFormat = "TO_CHAR(t.completion_date, 'YYYY-MM')";
+			groupByClause = "TO_CHAR(t.completion_date, 'YYYY-MM'), s.floor";
+		}
+
+		let query = knex('tasks as t')
 			.select(
-				knex.raw("TO_CHAR(t.completion_date, 'YYYY-MM') as ano_mes"),
+				knex.raw(`${dateFormat} as periodo`),
 				's.floor',
 				knex.raw('SUM(worker_quantity) as total_worker_quantity')
 			)
 			.join('services as s', 't.service_id', 's.id')
 			.join('profiles as p', 'p.id', 't.worker_id')
-			.groupByRaw("TO_CHAR(t.completion_date, 'YYYY-MM'), s.floor")
-			.orderByRaw("TO_CHAR(t.completion_date, 'YYYY-MM'), s.floor")
+			.whereNotNull('t.completion_date')
+			.where('s.is_done', true);
+
+		if (params.periodProduction === 'week') {
+			// Hoje e os últimos 6 dias (total de 7 dias)
+			query = query.whereRaw("DATE(t.completion_date) >= CURRENT_DATE - INTERVAL '6 days' AND DATE(t.completion_date) <= CURRENT_DATE");
+		}
+
+		const result = await query
+			.groupByRaw(groupByClause)
+			.orderByRaw(groupByClause);
 
 		return result
 	}
