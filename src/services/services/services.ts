@@ -42,10 +42,7 @@ export const services = (app: Application) => {
 				//schemaHooks.validateQuery(servicesQueryValidator),
 				//schemaHooks.resolveQuery(servicesQueryResolver),
 			],
-			find: [
-				applyFindFilters,
-				conditionalPagination
-			],
+			find: [applyFindFilters, conditionalPagination],
 			get: [],
 			create: [
 				//schemaHooks.validateData(servicesDataValidator),
