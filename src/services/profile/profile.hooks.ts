@@ -7,16 +7,17 @@ export const saveProfileId = async (context: HookContext) => {
 }
 
 export const processProfileFindQuery = async (context: HookContext) => {
-    const query = context.params.query;
+    const query = context.params.query;
 
-    if (query) {
-        if (query.name) {
-            query.name = { $ilike: query.name };
-        }
+    if (query) {
+        if (query.$search) {
+            const searchName = query.$search;
+            delete query.$search; 
+            query.name = { $ilike: `%${searchName}%` };
+        }
+    }
 
-    }
-
-    return context;
+    return context;
 };
 
 export const composeUserProfile = async (context: HookContext) => {
