@@ -4,13 +4,15 @@ import type { TransportConnection, Application } from '@feathersjs/feathers'
 import authenticationClient from '@feathersjs/authentication-client'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
-import { tasksReportClient } from './services/tasks/report/report.shared'
+import { tasksReportClient } from './services/report/report.shared'
 export type {
   TasksReport,
   TasksReportData,
   TasksReportQuery,
   TasksReportPatch
-} from './services/tasks/report/report.shared'
+
+} from './services/report/report.shared'
+
 
 import { employeeClient } from './services/employee/employee.shared'
 export type {

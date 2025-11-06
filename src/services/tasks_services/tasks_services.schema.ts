@@ -1,6 +1,6 @@
 import { FromSchema, getValidator, querySyntax, resolve } from "@feathersjs/schema";
-import { dataValidator, queryValidator } from "../../../validators";
-import { HookContext } from "../../../declarations";
+import { dataValidator, queryValidator } from "../../validators";
+import { HookContext } from "../../declarations";
 import { TasksServicesService } from "./tasks_services.class";
 import { v4 as uuidv4 } from 'uuid'
 

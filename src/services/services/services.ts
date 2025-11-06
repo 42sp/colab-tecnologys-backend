@@ -1,4 +1,143 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
+/**
+ * @openapi
+ * /services:
+ *   get:
+ *     tags:
+ *       - Services
+ *     summary: Listar serviços
+ *     description: Retorna lista de serviços cadastrados para uma obra específica
+ *     parameters:
+ *       - in: query
+ *         name: work_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID da obra
+ *       - in: query
+ *         name: $limit
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: $skip
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: Lista de serviços retornada com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 total:
+ *                   type: number
+ *                 limit:
+ *                   type: number
+ *                 skip:
+ *                   type: number
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Service'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *   post:
+ *     tags:
+ *       - Services
+ *     summary: Criar novo serviço
+ *     description: Cadastra um novo serviço ou importa múltiplos serviços via CSV
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             oneOf:
+ *               - $ref: '#/components/schemas/Service'
+ *               - type: array
+ *                 items:
+ *                   type: object
+ *                 description: Importação em lote via CSV
+ *     responses:
+ *       201:
+ *         description: Serviço(s) criado(s) com sucesso
+ *       400:
+ *         $ref: '#/components/responses/BadRequestError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *
+ * /services/{id}:
+ *   get:
+ *     tags:
+ *       - Services
+ *     summary: Buscar serviço por ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Serviço encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Service'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *   patch:
+ *     tags:
+ *       - Services
+ *     summary: Atualizar serviço
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               is_active:
+ *                 type: boolean
+ *               is_done:
+ *                 type: boolean
+ *               labor_quantity:
+ *                 type: number
+ *               material_quantity:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Serviço atualizado com sucesso
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *   delete:
+ *     tags:
+ *       - Services
+ *     summary: Deletar serviço
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Serviço deletado com sucesso
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ */
+
 import { authenticate } from '@feathersjs/authentication'
 import { hooks as schemaHooks } from '@feathersjs/schema'
 import express from '@feathersjs/express'
