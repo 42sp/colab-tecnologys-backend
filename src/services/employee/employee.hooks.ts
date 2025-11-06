@@ -124,6 +124,9 @@ export const createEmployee = async (context: HookContext) => {
 
 	const logger = app.get('logger') || console
 
+	logger.info(`CREATE Employee: Data Recebido (role_id): ${data.role_id}`)
+  logger.info(`CREATE Employee: Data Recebido COMPLETO: ${JSON.stringify(data)}`)
+
 	let newUserId: string | number | undefined
 
 	const userData = {
@@ -143,6 +146,8 @@ export const createEmployee = async (context: HookContext) => {
 		postcode: data.postcode,
 		photo: data.photo || '',
 	}
+
+	
 
 	try {
 		logger.info('CREATE Employee: Iniciando criação de usuário.')

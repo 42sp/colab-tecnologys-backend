@@ -59,7 +59,7 @@ export const employeeDataSchemaWithPassword = Type.Intersect(
 )
 
 export type EmployeeData = Static<typeof employeeDataSchemaWithPassword>
-export const employeeDataValidator = getValidator(employeeDataSchema, dataValidator)
+export const employeeDataValidator = getValidator(employeeDataSchemaWithPassword, dataValidator)
 export const employeeDataResolver = resolve<Employee, HookContext<EmployeeService>>({})
 
 
