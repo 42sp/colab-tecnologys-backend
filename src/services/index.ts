@@ -1,4 +1,4 @@
-import { tasksReport } from './tasks/report/report'
+import { tasksReport } from './report/report'
 import { employee } from './employee/employee'
 import { constructions } from './constructions/constructions'
 import { tasks } from './tasks/tasks'
@@ -11,7 +11,7 @@ import { profile } from './profile/profile'
 import { users } from './users/users'
 // For more information about this file see https://dove.feathersjs.com/guides/cli/application.html#configure-functions
 import type { Application } from '../declarations'
-import { tasksServices } from './tasks/services/tasks_services'
+import { tasksServices } from './tasks_services/tasks_services'
 
 export const services = (app: Application) => {
   app.configure(tasksReport)

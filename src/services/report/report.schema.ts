@@ -2,8 +2,8 @@
 import { resolve, getValidator, querySyntax } from '@feathersjs/schema'
 import type { FromSchema } from '@feathersjs/schema'
 
-import type { HookContext } from '../../../declarations'
-import { dataValidator, queryValidator } from '../../../validators'
+import type { HookContext } from '../../declarations'
+import { dataValidator, queryValidator } from '../../validators'
 import type { TasksReportService } from './report.class'
 
 // Main data model schema
@@ -67,7 +67,10 @@ export const tasksReportQuerySchema = {
   type: 'object',
   additionalProperties: false,
   properties: {
-    ...querySyntax(tasksReportSchema.properties)
+    ...querySyntax(tasksReportSchema.properties),
+    period: { type: 'string', enum: ['day', 'week', 'month'] },
+    worker_id: { type: 'string' },
+    periodProduction: { type: 'string', enum: ['week', 'month'] }
   }
 } as const
 export type TasksReportQuery = FromSchema<typeof tasksReportQuerySchema>

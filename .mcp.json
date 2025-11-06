@@ -1,0 +1,31 @@
+{
+  "mcpServers": {
+    "git-swagger-ui-express": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/scottie1984/swagger-ui-express"
+      ]
+    },
+    "git-swagger-jsdoc": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/Surnet/swagger-jsdoc"
+      ]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ]
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": [
+        "chrome-devtools-mcp@latest",
+        "--browser-ws-url=http://localhost:9222"
+      ]
+    }
+  }
+}
