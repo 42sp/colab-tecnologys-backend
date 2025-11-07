@@ -13,9 +13,7 @@ export const servicesSchema = {
 	$id: 'Services',
 	type: 'object',
 	additionalProperties: true,
-	required: [
-		'work_id',
-	],
+	required: ['work_id'],
 	properties: {
 		id: { type: 'string', format: 'uuid' },
 		work_id: { type: 'string' },
@@ -53,7 +51,7 @@ export const servicesDataSchema = {
 	$id: 'ServicesData',
 	type: 'object',
 	additionalProperties: true,
-	required: ['work_id',],
+	required: ['work_id'],
 	properties: {
 		...servicesSchema.properties,
 	},

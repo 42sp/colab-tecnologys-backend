@@ -1,5 +1,6 @@
 import type { Params } from '@feathersjs/feathers'
 import { KnexService } from '@feathersjs/knex'
+import type { Knex } from 'knex'
 import type { KnexAdapterParams, KnexAdapterOptions } from '@feathersjs/knex'
 import type { Application } from '../../declarations'
 import type { Services, ServicesData, ServicesPatch, ServicesQuery } from './services.schema'
@@ -8,37 +9,44 @@ import { v4 as uuidv4 } from 'uuid'
 export interface ServicesParams extends KnexAdapterParams<ServicesQuery> {}
 
 export interface CsvServiceData {
-    work_id: string //uuid da construção
-    service_code: string //id do serviço ex: 2637259
+	work_id: string // Não vem do CSV, mas é injetado pelo sistema
+	service_code: string // ← CSV: 'ID'
 
-    tower: string
-    floor: string
-    apartment: string
-    measurement_unit: string
-    service_description: string
+	tower: string // ← CSV: 'TORRE'
+	floor: string // ← CSV: 'PAV'
+	apartment: string // ← CSV: 'APTO'
+	measurement_unit: string // ← CSV: 'UNIDADE DE MEDIÇÃO'
+	service_type_name: string // Mapeia o 'SERVIÇO' do CSV (Estrutura, Alvenaria, Fundação)
+	service_description: string
 
-    wall: string
-    thickness: number
+	wall: string // ← CSV: 'PAREDE'
+	thickness: number // ← CSV: 'ESPESSURA'
 
-    marking_m: number
-    fixation_m: number
-    elevation_m2: number
+	qty_exec: number // ← CSV: 'QTO EXE'
 
-    qty_material_m2: number
-    qty_model_m2: number
+	qty_material_m2: number // ← CSV: 'QTO MAT (m²)'
+	qty_model_m2: number // ← CSV: 'QTO MOD (m²)'
+
+	acronym: string // ← CSV: 'ACRONYM'
 }
 
 interface ImportError {
-    line: number
-    header: string
-    value: string | number
-    reason: string
+	line: number
+	header: string
+	value: string | number
+	reason: string
 }
 
 interface ImportBulkResult {
-    importedCount: number
-    totalCount: number
-    errors: ImportError[]
+	importedCount: number
+	totalCount: number
+	errors: ImportError[]
+}
+
+const SERVICE_TYPE_IDS = {
+	ESTRUTURA: 'cf5cf0b3-f412-4834-9136-401f713f0ac1',
+	ALVENARIA: 'e9f32070-1199-4bbf-8dbc-4d006b8aae6c',
+	FUNDACAO: 'f50e06aa-4515-4e38-8ddf-3de72abadf50',
 }
 
 export type { Services, ServicesData, ServicesPatch, ServicesQuery }
@@ -46,205 +54,230 @@ export type { Services, ServicesData, ServicesPatch, ServicesQuery }
 export interface ServicesParams extends KnexAdapterParams<ServicesQuery> {}
 
 /**
+ * Mapeia o nome do serviço para o ID correspondente, garantindo normalização.
+ * @param rawServiceName O nome do serviço vindo do CSV (ex: "Alvenaria", "FUNDAÇÃO").
+ * @returns O service_type_id (UUID) ou null se não for encontrado.
+ */
+function mapServiceTypeToId(rawServiceName: string | null | undefined): string | null {
+	if (!rawServiceName) return null
+	let name = rawServiceName.trim().toUpperCase()
+
+	name = name
+		.replace(/Ç/g, 'C')
+		.replace(/Ã/g, 'A')
+		.replace(/Ô/g, 'O')
+		.replace(/[^A-Z\s]/g, '')
+	name = name.replace(/\s+/g, '')
+
+	if (name === 'ESTRUTURA') {
+		return SERVICE_TYPE_IDS.ESTRUTURA
+	}
+	if (name === 'ALVENARIA') {
+		return SERVICE_TYPE_IDS.ALVENARIA
+	}
+	if (name === 'FUNDACAO') {
+		return SERVICE_TYPE_IDS.FUNDACAO
+	} // console.error(`[ImportBulk] Tipo de Serviço inválido (após normalização): "${rawServiceName}" -> "${name}"`);
+	return null
+}
+
+/**
  * Extrai o número do pavimento e a abreviação "PAV" do texto de pavimento.
- * Ex: "26º PAVIMENTO - TORRE A" -> "26º PAV"
- * Ex: "MEZANINO" -> "MEZANINO" (se for diferente do padrão)
  * @param rawFloor O valor de pavimento vindo do CSV (ex: "26º PAVIMENTO - TORRE A").
  * @returns O valor formatado (ex: "26º PAV").
  */
 function formatFloor(rawFloor: string): string {
-    if (!rawFloor) {
-        return '';
-    }
+	if (!rawFloor) {
+		return ''
+	}
 
-    // A Regex busca:
-    // 1. (^.*?) : Qualquer caractere no início (não ganancioso)
-    // 2. (PAV) : A string "PAV"
-    // 3. (?:IMENTO)? : Opcionalmente, a string "IMENTO" (para completar "PAVIMENTO")
-    // 4. (.*) : O restante da string até o final.
-    const regex = /^(.*PAV(?:IMENTO)?).*$/i;
-    const match = rawFloor.trim().match(regex);
+	const regex = /^(.*PAV(?:IMENTO)?).*$/i
+	const match = rawFloor.trim().match(regex)
 
-    if (match) {
-        // match[1] contém a parte que queremos manter (ex: "26º PAVIMENTO")
-        // Substituímos "PAVIMENTO" por "PAV" para padronizar.
-        return match[1]
-            .replace(/PAVIMENTO/i, 'PAV')
-            .trim();
-    }
+	if (match) {
+		return match[1].replace(/PAVIMENTO/i, 'PAV').trim()
+	}
 
-    // Retorna o valor original se não encontrar o padrão (ex: "MEZANINO")
-    return rawFloor.trim();
+	return rawFloor.trim()
 }
 
 export class ServicesService<ServiceParams extends Params = ServicesParams> extends KnexService<
-    Services,
-    ServicesData,
-    ServicesParams,
-    ServicesPatch
+	Services,
+	ServicesData,
+	ServicesParams,
+	ServicesPatch
 > {
-    app: Application
+	app: Application
 
-    constructor(options: KnexAdapterOptions, app: Application) {
-        super(options)
-        this.app = app
-    }
+	constructor(options: KnexAdapterOptions, app: Application) {
+		super(options)
+		this.app = app
+	}
 
+	async create(data: ServicesData, params?: ServiceParams): Promise<Services>
+	async create(data: ServicesData[], params?: ServiceParams): Promise<Services[]>
+	async create(
+		data: ServicesData | ServicesData[],
+		params?: ServiceParams,
+	): Promise<Services | Services[]> {
+		return super.create(data as any, params)
+	}
 
-    async create(data: ServicesData, params?: ServiceParams): Promise<Services>;
-    async create(data: ServicesData[], params?: ServiceParams): Promise<Services[]>;
-    async create(data: ServicesData | ServicesData[], params?: ServiceParams): Promise<Services | Services[]> {
-        return super.create(data as any, params);
-    }
+	/**
+	 * Processa a importação em lote de dados de CSV usando Transação Manual (SELECT -> UPDATE/INSERT)
+	 */
+	async _processImportBulk(data: CsvServiceData[]): Promise<ImportBulkResult> {
+		const logger = this.app.get('logger')
+		logger.info(`[ImportBulk] Iniciando importação em lote de ${data.length} registros.`)
+		const errors: ImportError[] = []
+		const validData: ServicesData[] = []
+		let totalUpdated = 0
+		let totalInserted = 0
 
-    
+		for (let i = 0; i < data.length; i++) {
+			const item = data[i]
+			const lineNumber = i + 2
 
-    async _processImportBulk(data: CsvServiceData[]): Promise<ImportBulkResult> {
+			const rawExecution = item.qty_exec
+			const executionAcronym = item.acronym?.trim()?.toUpperCase()
+			const serviceTypeId = mapServiceTypeToId(item.service_type_name)
 
-        const logger = this.app.get('logger')
-        logger.info(`[ImportBulk] Iniciando importação em lote de ${data.length} registros.`)
-        const errors: ImportError[] = []
-        const validData: ServicesData[] = [] 
+			const formattedFloor = formatFloor(item.floor)
 
-        for (let i = 0; i < data.length; i++) {
-            const item = data[i]
-            const lineNumber = i + 2
-            let servicesCreatedFromLine = 0
+			if (!serviceTypeId) {
+				errors.push({
+					line: lineNumber,
+					header: 'SERVIÇO',
+					value: item.service_type_name || 'N/A',
+					reason:
+						'Tipo de Serviço inválido (deve ser Estrutura, Alvenaria ou Fundação). O registro foi ignorado.',
+				})
+				continue
+			}
 
-            // Coleta dos valores do item
-            const rawMarking = item.marking_m
-            const rawFixation = item.fixation_m
-            const rawElevation = item.elevation_m2
+			if (['M', 'F', 'E'].includes(executionAcronym) && rawExecution > 0) {
+				const newServiceId = item.service_code
+				const newServiceDescription = item.service_description
 
-            const formattedFloor = formatFloor(item.floor);
+				const serviceData: ServicesData = {
+					id: uuidv4(),
+					work_id: item.work_id,
+					service_type_id: serviceTypeId,
+					tower: item.tower,
+					floor: formattedFloor,
+					apartment: item.apartment,
+					measurement_unit: item.measurement_unit,
+					thickness: item.thickness,
+					stage: item.wall,
+					material_quantity: item.qty_material_m2,
+					worker_quantity: item.qty_model_m2,
+					acronym: executionAcronym,
+					service_id: newServiceId,
+					service_description: newServiceDescription,
+					labor_quantity: rawExecution,
+					bonus: 0,
+					is_active: true,
+					is_done: false,
+				}
 
-            // Criação do array de medições com os valores do item atual
-            const measurements: { prefix: string; description: string; value: number }[] = [
-                {
-                    prefix: 'M',
-                    description: 'Marcação',
-                    value: rawMarking,
-                },
-                {
-                    prefix: 'F',
-                    description: 'Fixação',
-                    value: rawFixation,
-                },
-                {
-                    prefix: 'E',
-                    description: 'Elevação',
-                    value: rawElevation,
-                },
-            ] 
+				validData.push(serviceData)
+			} else {
+				errors.push({
+					line: lineNumber,
+					header: 'ACRONYM / QTO_EXE',
+					value: `${executionAcronym || 'N/A'} / ${rawExecution}`,
+					reason:
+						'Acrônimo inválido (deve ser M, F ou E) ou Quantidade de Execução (QTO_EXE) é zero. O registro foi ignorado.',
+				})
+			}
+		}
+		if (errors.length > 0) {
+			logger.warn(`[ImportBulk] ${errors.length} erros de validação encontrados.`)
+			return { importedCount: 0, totalCount: data.length, errors: errors }
+		} // **********************************
+		// BLOCO DE TRANSAÇÃO: SELECT -> UPSERT
+		// **********************************
 
-            //Tentar criar os serviços granulares (M, F, E)
-            for (const measurement of measurements) {
-                if (measurement.value > 0) {
-                    servicesCreatedFromLine++ 
+		if (validData.length === 0) {
+			return { importedCount: 0, totalCount: data.length, errors: [] }
+		}
 
-                    const newServiceId = `${measurement.prefix}-${item.service_code}`
-                    const formattedValue = measurement.value.toFixed(2).replace('.', ',') 
-                    const newServiceDescription = `${measurement.description}: ${formattedValue}` 
+		const knex = this.Model.client
 
-                    const serviceData: ServicesData = {
-    
-                        id: uuidv4(),
-                        // Campos de mapeamento direto/constantes
-                        work_id: item.work_id,
-                        service_type_id: 'e9f32070-1199-4bbf-8dbc-4d006b8aae6c',
-                        tower: item.tower,
-                        floor: formattedFloor,
-                        apartment: item.apartment,
-                        measurement_unit: item.measurement_unit,
-                        thickness: item.thickness,
-                        stage: item.wall,
-                        material_quantity: item.qty_material_m2,
-                        worker_quantity: item.qty_model_m2,
-                        acronym: measurement.prefix,
-                        
-                        // Campos transformados (IDs e valores)
-                        service_id: newServiceId,             
-                        service_description: newServiceDescription, 
-                        labor_quantity: measurement.value,    
-                        
-                        bonus: 0, 
-                        is_active: true,
-                        is_done: false,
-                    };
+		try {
+			await knex.transaction(async (trx: Knex.Transaction) => {
+				logger.info(
+					`[ImportBulk] Iniciando transação para processar ${validData.length} registros.`,
+				)
+				for (const item of validData) {
+					// 1. Tenta encontrar o registro pelo par service_id / work_id
+					const existing = await trx(this.options.name)
+						.where({
+							service_id: item.service_id,
+							work_id: item.work_id,
+						})
+						.first()
+						// FOR UPDATE bloqueia a linha para evitar problemas de concorrência (race conditions)
+						.forUpdate()
 
-                    validData.push(serviceData)
-                }
-            } 
+					// Prepara os dados para atualização (tudo exceto o ID primário, que já existe)
+					const updateData = { ...item }
+					delete updateData.id
 
-            // VALIDAÇÃO: Pelo menos um tipo de serviço deve ser criado
-            if (servicesCreatedFromLine === 0) {
-                errors.push({
-                    line: lineNumber,
-                    header: 'MARCAÇÃO/FIXAÇÃO/ELEVAÇÃO',
-                    value: '0',
-                    reason:
-                        'Nenhum valor de Marcação, Fixação ou Elevação foi encontrado (> 0) para esta linha. O registro original foi ignorado.',
-                })
-            }
-        } 
-        
-        // ***************************************************************
-        // BLOCO DE INSERÇÃO EM LOTE
-        // ***************************************************************
+					if (existing) {
+						// Se encontrado: UPDATE
+						await trx(this.options.name).where('id', existing.id).update(updateData)
 
-        if (errors.length > 0) {
-            logger.warn(
-                `[ImportBulk] ${errors.length} erros de validação encontrados. Nenhum dado inserido.`,
-            )
-            return {
-                importedCount: 0,
-                totalCount: data.length,
-                errors: errors,
-            }
-        }
-        if (validData.length > 0) {
-            const knex = this.Model // Acesso ao objeto Knex (tabela)
-            const tableName = this.options.name // Nome da tabela ('services')
-            const batchSize = 1000 // Inserir em lotes de 1000 registros
+						totalUpdated++
+						logger.debug(
+							`[ImportBulk] UPDATE (Conflito): service_id ${item.service_id} (Work: ${item.work_id}) atualizado.`,
+						)
+					} else {
+						// Se não encontrado: INSERT
+						await trx(this.options.name).insert(item)
+						totalInserted++
+						logger.debug(
+							`[ImportBulk] INSERT: service_id ${item.service_id} (Work: ${item.work_id}) inserido.`,
+						)
+					}
+				}
+			})
 
-            try {
-                logger.info('[ImportBulk] Dados a serem inseridos:', validData[0]);
-                await knex.batchInsert(tableName, validData, batchSize)
+			const totalAffected = totalInserted + totalUpdated
 
-                const insertedCount = validData.length
-                logger.info(`[ImportBulk] ${insertedCount} registros criados via batchInsert.`)
+			logger.info(
+				`[ImportBulk] Importação concluída na transação. Total afetado: ${totalAffected}. Inseridos: ${totalInserted}, Atualizados: ${totalUpdated}.`,
+			)
 
-                return {
-                    importedCount: insertedCount,
-                    totalCount: data.length,
-                    errors: [],
-                }
-            } catch (e: any) {
-                logger.error(`[ImportBulk] Falha crítica no Batch Insert: ${e.message}`, e)
-                return {
-                    importedCount: 0,
-                    totalCount: data.length,
-                    errors: [
-                        {
-                            line: 0,
-                            header: 'DB Error',
-                            value: 'N/A',
-                            reason:
-                                e.message || 'Falha desconhecida no banco de dados durante a importação em lote.',
-                        },
-                    ],
-                }
-            }
-        }
-        return { importedCount: 0, totalCount: data.length, errors: [] }
-    }
+			return {
+				importedCount: totalAffected,
+				totalCount: data.length,
+				errors: [],
+			}
+		} catch (e: any) {
+			logger.error(`[ImportBulk] Erro fatal na transação SELECT/UPSERT: ${e.message}`, e)
+
+			return {
+				importedCount: 0,
+				totalCount: data.length,
+				errors: [
+					{
+						line: 1,
+						header: 'DB_FATAL_TRANSACTION',
+						value: 'N/A',
+						reason: `Erro na transação: ${e.message}. Todos os dados foram revertidos.`,
+					},
+				],
+			}
+		}
+	}
 }
 
 export const getOptions = (app: Application): KnexAdapterOptions => {
-    return {
-        paginate: false,
-        Model: app.get('postgresqlClient'),
-        name: 'services',
-        multi: ['create'],
-    }
+	return {
+		paginate: false,
+		Model: app.get('postgresqlClient'),
+		name: 'services',
+		multi: ['create'],
+	}
 }

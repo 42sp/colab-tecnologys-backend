@@ -205,7 +205,6 @@ export const users = (app: Application) => {
                 schemaHooks.resolveData(usersDataResolver),
             ],
             patch: [
-                
                 resetPassword,
                 schemaHooks.validateData(usersPatchValidator),
                 schemaHooks.resolveData(usersPatchResolver),

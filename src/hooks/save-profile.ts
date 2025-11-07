@@ -12,7 +12,13 @@ export const saveProfile = async (context: HookContext) => {
     name: context.params.data.name,
     email: context.params.data.email,
     phone: context.params.data.phone,
-    role_id: context.params.data.roleId
+    role_id: context.params.data.roleId,
+
+		date_of_birth: context.params.data.date_of_birth,
+    address: context.params.data.address,
+    city: context.params.data.city,
+    state: context.params.data.state,
+    postcode: context.params.data.postcode,
   })
 
   console.log('Profile created with ID:', profile.id)

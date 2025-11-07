@@ -74,6 +74,7 @@ export const profileQuerySchema = {
 	additionalProperties: false,
 	properties: {
 		...querySyntax(profileSchema.properties),
+		$search: { type: 'string' },
 	},
 } as const
 export type ProfileQuery = FromSchema<typeof profileQuerySchema>

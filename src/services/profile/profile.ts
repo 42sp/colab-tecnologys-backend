@@ -52,24 +52,8 @@ export const profile = (app: Application) => {
 			],
 			get: [],
 			create: [
-
-				// Depois valida o payload final
 				schemaHooks.validateData(profileDataValidator),
 				schemaHooks.resolveData(profileDataResolver),
-
-				// Duplicidade
-				/*async (context) => {
-					const dataArray = Array.isArray(context.data) ? context.data : [context.data]
-					for (const data of dataArray) {
-						if (!data) continue
-						const existing = await context.app.service('profile').find({
-							query: { $or: [{ name: data.name }, { email: data.email }, { phone: data.phone }] },
-							paginate: false,
-						})
-						if (existing.length > 0) throw new BadRequest(`Funcionário ${data.name} já registrado`)
-					}
-					return context
-				},*/
 			],
 			patch: [
 				schemaHooks.validateData(profilePatchValidator),
