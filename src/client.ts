@@ -4,6 +4,14 @@ import type { TransportConnection, Application } from '@feathersjs/feathers'
 import authenticationClient from '@feathersjs/authentication-client'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
+import { registerClient } from './services/register/register.shared'
+export type {
+  Register,
+  RegisterData,
+  RegisterQuery,
+  RegisterPatch
+} from './services/register/register.shared'
+
 import { tasksReportClient } from './services/report/report.shared'
 export type {
   TasksReport,
@@ -65,7 +73,6 @@ export type { Profile, ProfileData, ProfileQuery, ProfilePatch } from './service
 import { usersClient } from './services/users/users.shared'
 export type { Users, UsersData, UsersQuery, UsersPatch } from './services/users/users.shared'
 
-
 export interface Configuration {
   connection: TransportConnection<ServiceTypes>
 }
@@ -103,5 +110,6 @@ export const createClient = <Configuration = any,>(
   client.configure(constructionsClient)
   client.configure(employeeClient)
   client.configure(tasksReportClient)
+  client.configure(registerClient)
   return client
 }
