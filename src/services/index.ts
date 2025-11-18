@@ -1,3 +1,4 @@
+import { waterMelonSync } from './water-melon-sync/water-melon-sync'
 import { register } from './register/register'
 import { tasksReport } from './report/report'
 import { employee } from './employee/employee'
@@ -15,6 +16,7 @@ import type { Application } from '../declarations'
 import { tasksServices } from './tasks_services/tasks_services'
 
 export const services = (app: Application) => {
+  app.configure(waterMelonSync)
   app.configure(register)
   app.configure(tasksReport)
   app.configure(employee)

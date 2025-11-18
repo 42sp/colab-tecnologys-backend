@@ -4,6 +4,14 @@ import type { TransportConnection, Application } from '@feathersjs/feathers'
 import authenticationClient from '@feathersjs/authentication-client'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
+import { waterMelonSyncClient } from './services/water-melon-sync/water-melon-sync.shared'
+export type {
+  WaterMelonSync,
+  WaterMelonSyncData,
+  WaterMelonSyncQuery,
+  WaterMelonSyncPatch
+} from './services/water-melon-sync/water-melon-sync.shared'
+
 import { registerClient } from './services/register/register.shared'
 export type {
   Register,
@@ -111,5 +119,6 @@ export const createClient = <Configuration = any,>(
   client.configure(employeeClient)
   client.configure(tasksReportClient)
   client.configure(registerClient)
+  client.configure(waterMelonSyncClient)
   return client
 }
