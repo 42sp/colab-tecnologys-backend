@@ -79,7 +79,9 @@ export const profile = (app: Application) => {
 		},
 		after: {
 			all: [],
-			create: [saveProfileId],
+			create: [
+				// saveProfileId
+			],
 			get: [
 				//composeUserProfile
 			]

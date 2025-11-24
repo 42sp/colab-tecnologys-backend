@@ -171,7 +171,7 @@ export const services = (app: Application) => {
 	app.service(servicesPath).hooks({
 		around: {
 			all: [
-				authenticate('jwt'),
+				// authenticate('jwt'),
 				//schemaHooks.resolveExternal(servicesExternalResolver),
 				//schemaHooks.resolveResult(servicesResolver),
 			],

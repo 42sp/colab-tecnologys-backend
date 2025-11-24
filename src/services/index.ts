@@ -1,3 +1,4 @@
+import { waterMelonSyncUnallowed } from './water-melon-sync-unallowed/water-melon-sync-unallowed'
 import { waterMelonSync } from './water-melon-sync/water-melon-sync'
 import { register } from './register/register'
 import { tasksReport } from './report/report'
@@ -16,6 +17,7 @@ import type { Application } from '../declarations'
 import { tasksServices } from './tasks_services/tasks_services'
 
 export const services = (app: Application) => {
+  app.configure(waterMelonSyncUnallowed)
   app.configure(waterMelonSync)
   app.configure(register)
   app.configure(tasksReport)

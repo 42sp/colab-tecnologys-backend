@@ -4,9 +4,20 @@ import type { HookContext } from '../declarations'
 export const removeProps = async (context: HookContext) => {
   console.log(`Running hook remove-props on ${context.path}.${context.method}`)
 
+		console.log(context.data)
+
     if (context.data) {
 
-      const keysToKeep = ['cpf', 'password']; 
+      const keysToKeep = [
+				'id',
+				'cpf',
+				'password',
+				'role_id',
+				'address_id',
+				'name',
+				'email',
+				'phone',
+			];
 
       context.params = { ...context.params, data: context.data };
 
@@ -15,6 +26,8 @@ export const removeProps = async (context: HookContext) => {
       );
 
       context.data = objects;
+
+			console.log(objects);
 
     }
     return context;

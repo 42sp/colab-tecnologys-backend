@@ -159,7 +159,7 @@ import { usersPath, usersMethods } from './users.shared'
 import { saveProfile } from '../../hooks/save-profile'
 import { getLoginToken } from '../../hooks/get-login-token'
 import { removeProps } from '../../hooks/remove-props'
-import { saveProfileId } from '../profile/profile.hooks'
+// import { saveProfileId } from '../profile/profile.hooks'
 import { resetPassword } from '../../hooks/reset-password'
 
 
@@ -205,7 +205,7 @@ export const users = (app: Application) => {
                 schemaHooks.resolveData(usersDataResolver),
             ],
             patch: [
-                
+
                 resetPassword,
                 schemaHooks.validateData(usersPatchValidator),
                 schemaHooks.resolveData(usersPatchResolver),
@@ -214,9 +214,9 @@ export const users = (app: Application) => {
         },
         after: {
             all: [],
-            create: [ 
-                saveProfile,
-                saveProfileId, 
+            create: [
+                // saveProfile,
+                // saveProfileId,
                 getLoginToken
             ],
         },

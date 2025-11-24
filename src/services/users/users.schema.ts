@@ -18,14 +18,13 @@ export const usersSchema = {
 	additionalProperties: false,
 	required: ['cpf', 'password'],
 	properties: {
-		id: { type: 'string', format: 'uuid' },
+		id: { type: 'string' },
 		cpf: { type: 'string' },
 		name: { type: 'string' },
 		email: { type: 'string' },
 		phone: { type: 'string' },
-		roleId: { type: 'string' },
+		role_id: { type: 'string' },
 		password: { type: 'string' },
-		profile_id: { type: 'string', format: 'uuid' },
 		is_active: { type: 'boolean' },
 		is_available: { type: 'boolean' },
 		created_at: { type: 'string', format: 'date-time' },
@@ -53,7 +52,6 @@ export const usersDataSchema = {
 export type UsersData = FromSchema<typeof usersDataSchema>
 export const usersDataValidator = getValidator(usersDataSchema, dataValidator)
 export const usersDataResolver = resolve<UsersData, HookContext<UsersService>>({
-	id: async () => uuidv4(),
 	password: passwordHash({ strategy: 'local' }),
 	cpf: async (value) => {
 		if (!value) throw new BadRequest('CPF is required')
@@ -62,7 +60,7 @@ export const usersDataResolver = resolve<UsersData, HookContext<UsersService>>({
 		if (!isValidCPF(cpfDigits)) throw new BadRequest('CPF is invalid')
 
 		return cpfDigits
-	},
+	}
 })
 
 // Schema for updating existing data
@@ -108,7 +106,7 @@ export const usersQueryResolver = resolve<UsersQuery, HookContext<UsersService>>
 		}
 
 		if (context.params.user && context.method !== 'find') {
-			return value; 
+			return value;
 		}
 
 		if (context.params.user && !value) {
@@ -116,7 +114,7 @@ export const usersQueryResolver = resolve<UsersQuery, HookContext<UsersService>>
 			return context.params.user.id
 		}
 
-		
+
 		return value
 	},
 })

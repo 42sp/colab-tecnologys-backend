@@ -4,6 +4,14 @@ import type { TransportConnection, Application } from '@feathersjs/feathers'
 import authenticationClient from '@feathersjs/authentication-client'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
+import { waterMelonSyncUnallowedClient } from './services/water-melon-sync-unallowed/water-melon-sync-unallowed.shared'
+export type {
+  WaterMelonSyncUnallowed,
+  WaterMelonSyncUnallowedData,
+  WaterMelonSyncUnallowedQuery,
+  WaterMelonSyncUnallowedPatch
+} from './services/water-melon-sync-unallowed/water-melon-sync-unallowed.shared'
+
 import { waterMelonSyncClient } from './services/water-melon-sync/water-melon-sync.shared'
 export type {
   WaterMelonSync,
@@ -120,5 +128,6 @@ export const createClient = <Configuration = any,>(
   client.configure(tasksReportClient)
   client.configure(registerClient)
   client.configure(waterMelonSyncClient)
+  client.configure(waterMelonSyncUnallowedClient)
   return client
 }

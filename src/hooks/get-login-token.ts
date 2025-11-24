@@ -5,7 +5,9 @@ import type { HookContext } from '../declarations'
 export const getLoginToken = async (context: HookContext) => {
   console.log(`Running hook get-login-token on ${context.path}.${context.method}`)
 
+	console.log(context.params.data)
   const { cpf, password } = context.params.data
+
 
   const auth = await context.app.service('authentication').create({
     strategy: 'local',

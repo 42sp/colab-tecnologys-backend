@@ -22,23 +22,26 @@ export const getProfile = async (context: HookContext) => {
 
     // Exemplos de dados extras vindos de outros services
     //const [profile] = await Promise.all([
-     const profile = await app.service('profile').find({
-        query: { id: userId, $limit: 1, $select: ['name', 'email', 'photo', 'date_of_birth', 'phone', 'address', 'city', 'state', 'postcode', 'role_id'] }
-      });
+		const users = await app.service('users').find({
+			query: { id: userId, $limit: 1, $select: ['id', 'name', 'email', 'phone', 'role_id'] }
+		});
     //]);
 
-     console.log(profile)
+     console.log(users)
 
-    const roles = await app.service('roles').get(profile.data[0].role_id)
+    // let roles = null;
+    // const roleId = users.data[0]?.role_id;
+    // if (roleId) {
+    //   roles = await app.service('roles').get(roleId);
+    // }
 
 
     //const unwrap = (res: any) => (Array.isArray(res) ? res : res?.data ?? []);
-    const userData = {...profile.data[0], profileId:user}
-   
+    const userData = {...users.data[0], profileId:user}
     // Anexa ao payload de resposta do login
     context.result.meta = {
       profile:{...userData},
-      roles
+      // roles
     };
 
     return context;
