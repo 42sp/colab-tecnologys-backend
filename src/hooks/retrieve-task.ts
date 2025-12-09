@@ -12,6 +12,9 @@ export const retrieveTask = async (context: HookContext) => {
   const { result, app } = context;
   const data = Array.isArray(result.data) ? result.data : Array.isArray(result) ? result : [result];
 
+  const uniqueStringIds = (values: unknown[]) =>
+    [...new Set(values.filter((value): value is string => typeof value === 'string' && value.length > 0))]
+
   // Filter properties service
   const serviceIds = [...new Set(data.map((t: any) => t.service_id))];
   const services = await app.service('services').find({
@@ -35,13 +38,13 @@ export const retrieveTask = async (context: HookContext) => {
 
 
   // Filter properties worker
-  const workerIds = [...new Set(data.map((t: any) => t.worker_id))];
-
-  const cleaned = workerIds.filter(item => item !== null);
-  const workers = await app.service('profile').find({
-    paginate: false,
-    query: { id: { $in: cleaned } }
-  });
+  const workerIds = uniqueStringIds(data.map((t: any) => t.worker_id));
+  const workers = workerIds.length
+    ? await app.service('profile').find({
+      paginate: false,
+      query: { id: { $in: workerIds } }
+    })
+    : [];
   const map_workers = Object.fromEntries(workers.map((s: any) => [s.id, s]));
 
   for (const w of data) {
@@ -53,11 +56,13 @@ export const retrieveTask = async (context: HookContext) => {
 
 
   // Filter properties construction
-  const constructionIds = [...new Set(data.map((t: any) => t.work_id))];
-  const constructions = await app.service('constructions').find({
-    paginate: false,
-    query: { id: { $in: constructionIds } }
-  });
+  const constructionIds = uniqueStringIds(data.map((t: any) => t.work_id));
+  const constructions = constructionIds.length
+    ? await app.service('constructions').find({
+      paginate: false,
+      query: { id: { $in: constructionIds } }
+    })
+    : [];
   const map_constructions = Object.fromEntries(constructions.map((s: any) => [s.id, s]));
 
   for (const c of data) {
@@ -68,11 +73,13 @@ export const retrieveTask = async (context: HookContext) => {
   }
 
   // Filter properties construction
-  const serviceTypeIds = [...new Set(data.map((t: any) => t.service_type_id))];
-  const serviceTypes = await app.service('service-types').find({
-    paginate: false,
-    query: { id: { $in: serviceTypeIds } }
-  });
+  const serviceTypeIds = uniqueStringIds(data.map((t: any) => t.service_type_id));
+  const serviceTypes = serviceTypeIds.length
+    ? await app.service('service-types').find({
+      paginate: false,
+      query: { id: { $in: serviceTypeIds } }
+    })
+    : [];
   const map_serviceTypes = Object.fromEntries(serviceTypes.map((s: any) => [s.id, s]));
 
   for (const s of data) {
